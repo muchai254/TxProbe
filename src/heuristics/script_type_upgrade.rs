@@ -1,0 +1,52 @@
+// Script type upgrade detection heuristic
+
+use crate::script::classify_script;
+use crate::tx::ParsedTx;
+use serde_json::{json, Value};
+
+use super::classification::infer_input_script_type;
+
+pub fn detect_script_type_upgrade(tx: &ParsedTx, is_coinbase: bool) -> Value {
+    if is_coinbase || tx.inputs.is_empty() || tx.outputs.is_empty() {
+        return json!({ "detected": false });
+    }
+
+    const SEGWIT_NATIVE: &[&str] = &["p2wpkh", "p2wsh", "p2tr"];
+
+    let all_legacy = tx
+        .inputs
+        .iter()
+        .all(|inp| !SEGWIT_NATIVE.contains(&infer_input_script_type(inp)));
+
+    if !all_legacy {
+        return json!({ "detected": false });
+    }
+
+    let mut to_types: Vec<&str> = Vec::new();
+    for out in &tx.outputs {
+        let t = classify_script(&out.script_pubkey);
+        if SEGWIT_NATIVE.contains(&t) && !to_types.contains(&t) {
+            to_types.push(t);
+        }
+    }
+
+    if to_types.is_empty() {
+        return json!({ "detected": false });
+    }
+    to_types.sort_unstable();
+
+    let mut from_types: Vec<&str> = Vec::new();
+    for inp in &tx.inputs {
+        let t = infer_input_script_type(inp);
+        if !from_types.contains(&t) {
+            from_types.push(t);
+        }
+    }
+    from_types.sort_unstable();
+
+    json!({
+        "detected": true,
+        "from_types": from_types,
+        "to_types": to_types,
+    })
+}
