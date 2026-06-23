@@ -1,7 +1,14 @@
 # Nixpacks build config for Railway.
-# Nixpacks installs Rust via nix (not rustup), so rustup is not available.
-# Native cargo build is correct here — Railway builds and runs in the same
-# container, so glibc compatibility is guaranteed without needing musl.
+#
+# By default Nixpacks auto-detects cross-compilation targets and injects
+# `rustup target add` steps. We override the setup phase explicitly to
+# install Rust (via rustup from nix) and set stable, without adding any
+# non-native target. This prevents the musl rustup call that fails because
+# rustup is not on PATH in the auto-generated setup.
+
+[phases.setup]
+nixPkgs = ["rustup", "nodejs_20"]
+cmds = ["rustup default stable"]
 
 [phases.install]
 cmds = ["npm install"]
