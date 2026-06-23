@@ -1,19 +1,14 @@
 # Nixpacks build config for Railway.
-# Installs musl-tools so Rust produces a fully static binary,
-# then builds the React frontend.
-
-[phases.setup]
-aptPkgs = ["musl-tools", "musl-dev", "pkg-config"]
+# Nixpacks installs Rust via nix (not rustup), so rustup is not available.
+# Native cargo build is correct here — Railway builds and runs in the same
+# container, so glibc compatibility is guaranteed without needing musl.
 
 [phases.install]
-cmds = [
-  "rustup target add x86_64-unknown-linux-musl",
-  "npm install",
-]
+cmds = ["npm install"]
 
 [phases.build]
 cmds = [
-  "cargo build --release --target x86_64-unknown-linux-musl",
+  "cargo build --release",
   "(cd web && npm ci && npm run build)",
 ]
 
