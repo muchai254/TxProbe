@@ -38,8 +38,12 @@ export default function AddressSummary({ address, stats, onWorstLeakClick }: Add
       <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-4)' }}>
         <PrivacyScoreRing score={stats.overall_score} size={80} animate={true} />
         <div>
-          <div style={{ fontSize: 'var(--text-lg)', fontWeight: 700 }}>{stats.overall_score}</div>
-          <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-muted)' }}>privacy score</div>
+          <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '4px' }}>
+            Privacy Score
+          </div>
+          <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-muted)' }}>
+            0 = traceable · 100 = opaque
+          </div>
         </div>
       </div>
 

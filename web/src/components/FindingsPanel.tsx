@@ -2,7 +2,7 @@ import { useState } from 'react'
 import type { HeuristicId, HeuristicResult } from '../lib/types'
 import { HEURISTICS } from '../lib/heuristics'
 import HeuristicRow from './HeuristicRow'
-import PrivacyScoreRing from './PrivacyScoreRing'
+import PrivacyScoreRing, { getScoreLabel } from './PrivacyScoreRing'
 
 interface FindingsPanelProps {
   score: number;
@@ -26,10 +26,12 @@ export default function FindingsPanel({ score, heuristics, detectedCount }: Find
   )
 
   const severityLabel = [
-    severityCounts.high > 0 ? `${severityCounts.high} high` : '',
-    severityCounts.medium > 0 ? `${severityCounts.medium} medium` : '',
-    severityCounts.low > 0 ? `${severityCounts.low} low` : '',
+    severityCounts.high > 0 ? `${severityCounts.high} serious` : '',
+    severityCounts.medium > 0 ? `${severityCounts.medium} notable` : '',
+    severityCounts.low > 0 ? `${severityCounts.low} minor` : '',
   ].filter(Boolean).join(' · ')
+
+  const isClean = score >= 80
 
   return (
     <div
@@ -42,6 +44,7 @@ export default function FindingsPanel({ score, heuristics, detectedCount }: Find
         height: '320px',
       }}
     >
+      {/* Score summary */}
       <div style={{
         display: 'flex',
         alignItems: 'center',
@@ -52,8 +55,15 @@ export default function FindingsPanel({ score, heuristics, detectedCount }: Find
       }}>
         <PrivacyScoreRing score={score} size={48} animate={true} />
         <div>
+          <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '2px' }}>
+            Privacy Score
+          </div>
           <div style={{ fontSize: 'var(--text-md)', fontWeight: 600 }}>
-            {score} <span style={{ color: 'var(--color-text-muted)', fontWeight: 400 }}>/ 100</span>
+            {score}
+            <span style={{ color: 'var(--color-text-muted)', fontWeight: 400 }}> / 100</span>
+            <span style={{ fontSize: 'var(--text-xs)', color: isClean ? 'var(--color-text-muted)' : 'var(--color-signal)', fontWeight: 400 }}>
+              {' '}· {getScoreLabel(score)}
+            </span>
           </div>
           <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-muted)' }}>
             {detectedCount === 0
@@ -62,6 +72,17 @@ export default function FindingsPanel({ score, heuristics, detectedCount }: Find
             }
           </div>
         </div>
+      </div>
+
+      {/* Severity legend */}
+      <div style={{
+        padding: 'var(--space-2) var(--space-6)',
+        borderBottom: '1px solid var(--color-border)',
+        fontSize: 'var(--text-xs)',
+        color: 'var(--color-text-muted)',
+        fontStyle: 'italic',
+      }}>
+        Severity reflects how much an observer learns from each flagged pattern.
       </div>
 
       {HEURISTICS.map(h => (

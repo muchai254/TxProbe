@@ -6,6 +6,14 @@ interface PrivacyScoreRingProps {
   animate?: boolean;
 }
 
+export function getScoreLabel(score: number): string {
+  if (score >= 90) return 'Private'
+  if (score >= 75) return 'Guarded'
+  if (score >= 55) return 'Traceable'
+  if (score >= 35) return 'Exposed'
+  return 'Transparent'
+}
+
 export default function PrivacyScoreRing({ score, size = 80, animate = true }: PrivacyScoreRingProps) {
   const circleRef = useRef<SVGCircleElement>(null)
   const radius = (size - 8) / 2
@@ -13,6 +21,7 @@ export default function PrivacyScoreRing({ score, size = 80, animate = true }: P
   const offset = circumference * (1 - score / 100)
   const isClean = score >= 80
   const strokeColor = isClean ? 'var(--color-border)' : 'var(--color-signal)'
+  const showLabel = size >= 64
 
   useEffect(() => {
     if (!animate || !circleRef.current) return
@@ -60,6 +69,7 @@ export default function PrivacyScoreRing({ score, size = 80, animate = true }: P
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
+        gap: '2px',
       }}>
         <span style={{
           fontFamily: 'var(--font-mono)',
@@ -70,6 +80,16 @@ export default function PrivacyScoreRing({ score, size = 80, animate = true }: P
         }}>
           {score}
         </span>
+        {showLabel && (
+          <span style={{
+            fontFamily: 'var(--font-mono)',
+            fontSize: '9px',
+            color: isClean ? 'var(--color-text-muted)' : 'var(--color-signal)',
+            lineHeight: 1,
+          }}>
+            {getScoreLabel(score)}
+          </span>
+        )}
       </div>
     </div>
   )

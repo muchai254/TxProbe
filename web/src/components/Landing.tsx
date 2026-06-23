@@ -4,6 +4,38 @@ import type { AppMode } from '../lib/types'
 import { fetchSamples } from '../lib/api'
 // @ts-ignore — JSX component, no type declarations needed
 import TextType from './TextType'
+import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from './ui/Accordion'
+
+const FAQ_ITEMS = [
+  {
+    q: 'What is a privacy score?',
+    a: 'A 0–100 score measuring how much an observer can learn from a Bitcoin transaction or address history. 100 means an observer learns nothing useful. 0 means your full transaction graph is visible. Most real-world transactions score between 40 and 90.',
+  },
+  {
+    q: 'Is it safe to enter my transaction ID or Bitcoin address?',
+    a: 'Yes. Transaction IDs and Bitcoin addresses are already public on the blockchain — anyone can look them up. TxProbe does not ask for private keys, seed phrases, or any sensitive information. Nothing you enter here is stored.',
+  },
+  {
+    q: 'What is a chain analysis heuristic?',
+    a: 'A heuristic is a pattern that blockchain analysts use to make inferences about who controls which coins. TxProbe applies the same 14 techniques used by professional analytics firms, so you can see exactly what they see.',
+  },
+  {
+    q: 'Why does address reuse damage my privacy?',
+    a: 'Every time you reuse a Bitcoin address, you link two or more transactions together. Over time this collapses your privacy across your entire history — anyone watching the blockchain can connect the dots. Use a fresh address for every payment.',
+  },
+  {
+    q: "What's the difference between analyzing a transaction and an address?",
+    a: 'A transaction analysis examines a single event: what was sent, to whom, and what patterns are visible. An address analysis reviews your full transaction history, showing how privacy issues compound over time and which transaction was your worst privacy leak.',
+  },
+  {
+    q: 'How can I improve my Bitcoin privacy?',
+    a: 'Use a fresh receive address for every transaction. Avoid consolidating many small UTXOs in a single transaction. Consider CoinJoin protocols (Whirlpool, JoinMarket) for high-value amounts. Use the Lightning Network for small everyday payments. Avoid round-number payment amounts.',
+  },
+  {
+    q: 'Does TxProbe store my data or track me?',
+    a: 'No. Transaction IDs and addresses are public blockchain data — TxProbe fetches them from the public Bitcoin network the same way any block explorer does. Analysis results are cached briefly for performance and discarded. No user accounts, no logs, no tracking.',
+  },
+]
 
 const TYPING_SENTENCES = [
   'Every Bitcoin transaction leaves clues.',
@@ -106,7 +138,7 @@ export default function Landing({ onTxSubmit, onAddressSubmit }: LandingProps) {
   const currentSamples = mode === 'transaction' ? samples?.txids : samples?.addresses
 
   return (
-    <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: 'var(--color-bg)' }}>
+    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: 'var(--color-bg)' }}>
       <header style={{
         height: '48px',
         backgroundColor: 'var(--color-surface)',
@@ -328,6 +360,36 @@ export default function Landing({ onTxSubmit, onAddressSubmit }: LandingProps) {
         </div>
         </div>
       </div>
+
+      {/* FAQ section */}
+      <section style={{
+        borderTop: '1px solid var(--color-border)',
+        backgroundColor: 'var(--color-surface)',
+        display: 'flex',
+        justifyContent: 'center',
+        padding: 'var(--space-8)',
+      }}>
+        <div style={{ width: '100%', maxWidth: '640px' }}>
+          <p style={{
+            margin: '0 0 var(--space-6)',
+            fontFamily: 'var(--font-mono)',
+            fontSize: 'var(--text-xs)',
+            color: 'var(--color-text-muted)',
+            textTransform: 'uppercase',
+            letterSpacing: '0.08em',
+          }}>
+            Common questions
+          </p>
+          <Accordion type="single" collapsible>
+            {FAQ_ITEMS.map(item => (
+              <AccordionItem key={item.q} value={item.q}>
+                <AccordionTrigger>{item.q}</AccordionTrigger>
+                <AccordionContent>{item.a}</AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
+        </div>
+      </section>
     </div>
   )
 }

@@ -89,3 +89,30 @@ body {
 .shake { animation: shake 150ms ease-out; }
 .slide-up { animation: slide-up 300ms ease-out; }
 .fade-in { animation: fade-in 200ms ease-out both; }
+
+/* Accordion animation */
+@keyframes accordion-down {
+  from { height: 0; }
+  to { height: var(--radix-accordion-content-height); }
+}
+
+@keyframes accordion-up {
+  from { height: var(--radix-accordion-content-height); }
+  to { height: 0; }
+}
+
+.accordion-content[data-state=open] {
+  animation: accordion-down 200ms ease-out;
+}
+
+.accordion-content[data-state=closed] {
+  animation: accordion-up 200ms ease-out;
+}
+
+.accordion-trigger .accordion-chevron {
+  transition: transform 200ms ease-out;
+}
+
+.accordion-trigger[data-state=open] .accordion-chevron {
+  transform: rotate(180deg);
+}
