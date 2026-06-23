@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { Search, ArrowRight } from 'lucide-react'
+import { Search, ArrowRight, Fingerprint } from 'lucide-react'
 import type { AppMode } from '../lib/types'
 import { fetchSamples } from '../lib/api'
 // @ts-ignore — JSX component, no type declarations needed
@@ -145,9 +145,13 @@ export default function Landing({ onTxSubmit, onAddressSubmit }: LandingProps) {
         borderBottom: '1px solid var(--color-border)',
         display: 'flex',
         alignItems: 'center',
+        justifyContent: 'center',
         padding: '0 var(--space-6)',
       }}>
-        <span style={{ fontSize: 'var(--text-base)', fontWeight: 600 }}>TxProbe</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+          <Fingerprint size={15} style={{ color: 'var(--color-text)' }} />
+          <span style={{ fontSize: 'var(--text-base)', fontWeight: 600 }}>TxProbe</span>
+        </div>
       </header>
 
       <div style={{
@@ -390,6 +394,41 @@ export default function Landing({ onTxSubmit, onAddressSubmit }: LandingProps) {
           </Accordion>
         </div>
       </section>
+
+      {/* Footer */}
+      <footer style={{
+        borderTop: '1px solid var(--color-border)',
+        backgroundColor: 'var(--color-surface)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        height: '48px',
+        padding: '0 var(--space-6)',
+      }}>
+        <span style={{
+          fontFamily: 'var(--font-mono)',
+          fontSize: 'var(--text-xs)',
+          color: 'var(--color-text-muted)',
+        }}>
+          made with ❤️ by{' '}
+          <a
+            href="https://github.com/muchai254"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              color: 'var(--color-text)',
+              textDecoration: 'none',
+              borderBottom: '1px solid var(--color-border)',
+              fontWeight: 500,
+              transition: 'border-color var(--duration-fast)',
+            }}
+            onMouseEnter={e => { e.currentTarget.style.borderBottomColor = 'var(--color-text)' }}
+            onMouseLeave={e => { e.currentTarget.style.borderBottomColor = 'var(--color-border)' }}
+          >
+            muchai254
+          </a>
+        </span>
+      </footer>
     </div>
   )
 }
