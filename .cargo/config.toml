@@ -1,2 +1,5 @@
-[target.x86_64-unknown-linux-gnu]
-linker = "/tmp/zig-cc"
+# musl-gcc is used when compiling the portable static binary.
+# Install musl-tools on Ubuntu/Debian to enable: sudo apt-get install musl-tools
+# Railway's CI container installs this automatically via nixpacks.toml.
+[target.x86_64-unknown-linux-musl]
+linker = "musl-gcc"

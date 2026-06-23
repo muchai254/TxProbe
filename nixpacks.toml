@@ -1,0 +1,21 @@
+# Nixpacks build config for Railway.
+# Installs musl-tools so Rust produces a fully static binary,
+# then builds the React frontend.
+
+[phases.setup]
+aptPkgs = ["musl-tools", "musl-dev", "pkg-config"]
+
+[phases.install]
+cmds = [
+  "rustup target add x86_64-unknown-linux-musl",
+  "npm install",
+]
+
+[phases.build]
+cmds = [
+  "cargo build --release --target x86_64-unknown-linux-musl",
+  "(cd web && npm ci && npm run build)",
+]
+
+[start]
+cmd = "node server.js"

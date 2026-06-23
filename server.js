@@ -1,4 +1,5 @@
 import https from 'https';
+import fs from 'fs';
 import express from 'express';
 import { spawn } from 'child_process';
 import { createRequire } from 'module';
@@ -6,7 +7,15 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const BINARY = path.join(__dirname, 'target', 'release', 'txprobe-analyzer');
+
+// Prefer the static musl binary (produced by Railway / CI).
+// Fall back to the native build for local development.
+const BINARY_MUSL   = path.join(__dirname, 'target', 'x86_64-unknown-linux-musl', 'release', 'txprobe-analyzer');
+const BINARY_NATIVE = path.join(__dirname, 'target', 'release', 'txprobe-analyzer');
+const BINARY = (() => {
+  try { fs.accessSync(BINARY_MUSL, fs.constants.X_OK); return BINARY_MUSL; } catch { return BINARY_NATIVE; }
+})();
+
 const MEMPOOL = 'https://blockstream.info/api';
 
 const app = express();
