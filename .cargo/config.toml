@@ -1,5 +1,9 @@
-# musl-gcc is used when compiling the portable static binary.
-# Install musl-tools on Ubuntu/Debian to enable: sudo apt-get install musl-tools
-# Railway's CI container installs this automatically via nixpacks.toml.
+# Native target: zig-cc acts as a portable C linker on systems without gcc.
+# web.sh downloads zig and writes /tmp/zig-cc automatically before cargo runs.
+[target.x86_64-unknown-linux-gnu]
+linker = "/tmp/zig-cc"
+
+# musl target: used by Railway CI to produce a fully static binary.
+# nixpacks.toml installs musl-tools in the build container before cargo runs.
 [target.x86_64-unknown-linux-musl]
 linker = "musl-gcc"
