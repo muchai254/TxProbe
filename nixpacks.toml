@@ -1,13 +1,17 @@
 # Nixpacks build config for Railway.
 #
-# By default Nixpacks auto-detects cross-compilation targets and injects
-# `rustup target add` steps. We override the setup phase explicitly to
-# install Rust (via rustup from nix) and set stable, without adding any
-# non-native target. This prevents the musl rustup call that fails because
-# rustup is not on PATH in the auto-generated setup.
+# CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_LINKER overrides the /tmp/zig-cc entry
+# in .cargo/config.toml (which is only valid locally). gcc is installed via nix
+# so `cc` is available as the real linker on Railway.
+#
+# The explicit setup phase also prevents Nixpacks from auto-injecting
+# `rustup target add` steps based on .cargo/config.toml target sections.
+
+[variables]
+CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_LINKER = "cc"
 
 [phases.setup]
-nixPkgs = ["rustup", "nodejs_20"]
+nixPkgs = ["rustup", "gcc", "nodejs_20"]
 cmds = ["rustup default stable"]
 
 [phases.install]
