@@ -1,0 +1,83 @@
+{
+  "analysis": {
+    "classification": "self_transfer",
+    "fee_rate_sat_vb": 198.2,
+    "fee_sats": 22000,
+    "heuristics": {
+      "address_reuse": {
+        "detected": false
+      },
+      "batch_payment": {
+        "detected": false
+      },
+      "change_detection": {
+        "detected": false
+      },
+      "cioh": {
+        "detected": false
+      },
+      "coinjoin": {
+        "detected": false
+      },
+      "consolidation": {
+        "detected": false
+      },
+      "inscription": {
+        "detected": false
+      },
+      "locktime_analysis": {
+        "anti_fee_sniping": false,
+        "detected": true,
+        "locktime": 0,
+        "locktime_type": "none",
+        "rbf_signaling": true,
+        "wallet_fingerprint": "rbf_only"
+      },
+      "op_return": {
+        "detected": false
+      },
+      "peeling_chain": {
+        "detected": false
+      },
+      "round_number_payment": {
+        "detected": false
+      },
+      "script_type_upgrade": {
+        "detected": false
+      },
+      "self_transfer": {
+        "detected": true
+      },
+      "unnecessary_input": {
+        "detected": false
+      }
+    },
+    "input_count": 1,
+    "inputs": [
+      {
+        "address": "bc1q9gq96tr8fcjzxvy9rvcp7q4zmwa0pg5n2jcxah",
+        "index": 0,
+        "script_type": "p2wpkh",
+        "value_sats": 34247340
+      }
+    ],
+    "is_segwit": true,
+    "locktime": 0,
+    "output_count": 1,
+    "outputs": [
+      {
+        "address": "3BWiBJSuRL5XSFefALtnwoRtZj91qwRihS",
+        "index": 0,
+        "script_type": "p2sh",
+        "value_sats": 34225340
+      }
+    ],
+    "privacy_score": 100,
+    "rbf_signaling": true,
+    "txid": "d88b79b95305ec516482b8c77b9ac56324f7c76af6c534346553f8ac9d65829b",
+    "vbytes": 111,
+    "version": 1,
+    "weight": 441
+  },
+  "ok": true
+}

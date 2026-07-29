@@ -1,0 +1,123 @@
+{
+  "analysis": {
+    "classification": "unknown",
+    "fee_rate_sat_vb": 0.0,
+    "fee_sats": 0,
+    "heuristics": {
+      "address_reuse": {
+        "detected": false
+      },
+      "batch_payment": {
+        "detected": false
+      },
+      "change_detection": {
+        "detected": false
+      },
+      "cioh": {
+        "detected": false
+      },
+      "coinjoin": {
+        "detected": false
+      },
+      "consolidation": {
+        "detected": false
+      },
+      "inscription": {
+        "detected": false
+      },
+      "locktime_analysis": {
+        "detected": false
+      },
+      "op_return": {
+        "detected": true,
+        "output_index": 2,
+        "payload_size": 45,
+        "protocol": "unknown"
+      },
+      "peeling_chain": {
+        "detected": false
+      },
+      "round_number_payment": {
+        "detected": false
+      },
+      "script_type_upgrade": {
+        "detected": false
+      },
+      "self_transfer": {
+        "detected": false
+      },
+      "unnecessary_input": {
+        "detected": false
+      }
+    },
+    "input_count": 1,
+    "inputs": [
+      {
+        "address": "",
+        "index": 0,
+        "script_type": "p2sh-p2wsh",
+        "value_sats": 0
+      }
+    ],
+    "is_segwit": true,
+    "locktime": 1099882213,
+    "output_count": 8,
+    "outputs": [
+      {
+        "address": "1K6KoYC69NnafWJ7YgtrpwJxBLiijWqwa6",
+        "index": 0,
+        "script_type": "p2pkh",
+        "value_sats": 546
+      },
+      {
+        "address": "1AfCc4F9c4VTYSE31PUe2kUEKs6ZxiDjxm",
+        "index": 1,
+        "script_type": "p2pkh",
+        "value_sats": 314614320
+      },
+      {
+        "address": null,
+        "index": 2,
+        "script_type": "op_return",
+        "value_sats": 0
+      },
+      {
+        "address": null,
+        "index": 3,
+        "script_type": "op_return",
+        "value_sats": 0
+      },
+      {
+        "address": null,
+        "index": 4,
+        "script_type": "op_return",
+        "value_sats": 0
+      },
+      {
+        "address": null,
+        "index": 5,
+        "script_type": "op_return",
+        "value_sats": 0
+      },
+      {
+        "address": null,
+        "index": 6,
+        "script_type": "op_return",
+        "value_sats": 0
+      },
+      {
+        "address": null,
+        "index": 7,
+        "script_type": "op_return",
+        "value_sats": 0
+      }
+    ],
+    "privacy_score": 0,
+    "rbf_signaling": true,
+    "txid": "18649460fb32725480d8698c321b1e15a36365d793266c9c0fa478f9d7509de6",
+    "vbytes": 508,
+    "version": 1,
+    "weight": 2032
+  },
+  "ok": true
+}

@@ -1,0 +1,395 @@
+{
+  "analysis": {
+    "classification": "coinjoin",
+    "fee_rate_sat_vb": 5.0,
+    "fee_sats": 10250,
+    "heuristics": {
+      "address_reuse": {
+        "detected": false
+      },
+      "batch_payment": {
+        "detected": true,
+        "distinct_script_types": 1,
+        "output_count": 33
+      },
+      "change_detection": {
+        "confidence": "medium",
+        "confidence_score": 0.7,
+        "contributing_signals": [
+          "script_type_matches_inputs",
+          "change_value_smaller_than_payment",
+          "typical_change_position"
+        ],
+        "detected": true,
+        "fee_constrained": false,
+        "likely_change_index": 32,
+        "method": "script_type_match"
+      },
+      "cioh": {
+        "detected": true
+      },
+      "coinjoin": {
+        "confidence": "high",
+        "detected": true,
+        "equal_output_count": 8,
+        "estimated_participants": 8,
+        "mixing_denomination_sats": 20000000,
+        "total_input_count": 15
+      },
+      "consolidation": {
+        "detected": false
+      },
+      "inscription": {
+        "detected": false
+      },
+      "locktime_analysis": {
+        "anti_fee_sniping": false,
+        "detected": true,
+        "locktime": 0,
+        "locktime_type": "none",
+        "rbf_signaling": true,
+        "wallet_fingerprint": "rbf_only"
+      },
+      "op_return": {
+        "detected": false
+      },
+      "peeling_chain": {
+        "detected": false
+      },
+      "round_number_payment": {
+        "detected": true,
+        "round_output_indices": [
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+        ],
+        "threshold_sats": 1000000
+      },
+      "script_type_upgrade": {
+        "detected": false
+      },
+      "self_transfer": {
+        "detected": false
+      },
+      "unnecessary_input": {
+        "detected": false
+      }
+    },
+    "input_count": 15,
+    "inputs": [
+      {
+        "address": "bc1qcpar6gycvmvm57kaqampcusr9d0a8p7p9ktqdj",
+        "index": 0,
+        "script_type": "p2wpkh",
+        "value_sats": 50000000
+      },
+      {
+        "address": "bc1qk6n7w3nnf6w2tfhmt0sl9dpxv5lrecdlt3grx7",
+        "index": 1,
+        "script_type": "p2wpkh",
+        "value_sats": 50000000
+      },
+      {
+        "address": "bc1qz5sa6wur23hy5hqrsgk4k7cl0srtexaaxkug5q",
+        "index": 2,
+        "script_type": "p2wpkh",
+        "value_sats": 50000000
+      },
+      {
+        "address": "bc1qn7krnkh099nj7j45weyl2rycq0qnxksqe45yp8",
+        "index": 3,
+        "script_type": "p2wpkh",
+        "value_sats": 50000000
+      },
+      {
+        "address": "bc1q4xhhmzv7wfegvel0ga6esdpsjhwjccxzsqlcwc",
+        "index": 4,
+        "script_type": "p2wpkh",
+        "value_sats": 50000000
+      },
+      {
+        "address": "bc1qjk4kmfghkr3mhrnzx9pk522lwe0xf5v5xgm7t8",
+        "index": 5,
+        "script_type": "p2wpkh",
+        "value_sats": 50000000
+      },
+      {
+        "address": "bc1qsxka429ztjr37p3dg0dtk27ntwxwjnr07uw78x",
+        "index": 6,
+        "script_type": "p2wpkh",
+        "value_sats": 43046721
+      },
+      {
+        "address": "bc1qavuap3fz9rm9wdj2flv3dgpwp4w88jtuvg5jry",
+        "index": 7,
+        "script_type": "p2wpkh",
+        "value_sats": 43046721
+      },
+      {
+        "address": "bc1qmq26xsnr7f5ldgn84mmmrtelkmlk5ehgqhj7gr",
+        "index": 8,
+        "script_type": "p2wpkh",
+        "value_sats": 43046721
+      },
+      {
+        "address": "bc1qflceflvgg9x5834tjyvu0cxvtl2vx34wuqz4le",
+        "index": 9,
+        "script_type": "p2wpkh",
+        "value_sats": 43046721
+      },
+      {
+        "address": "bc1qaj8t2xj0c2542t6gsvsfx3dngk9y4ed39adehm",
+        "index": 10,
+        "script_type": "p2wpkh",
+        "value_sats": 43046721
+      },
+      {
+        "address": "bc1qn0ydlsjju4e87gshrptzsh05fc68szyxvhvck8",
+        "index": 11,
+        "script_type": "p2wpkh",
+        "value_sats": 43046721
+      },
+      {
+        "address": "bc1qjygaurk9s3z2uqjcrchdggujv6wwph5f5lgfy3",
+        "index": 12,
+        "script_type": "p2wpkh",
+        "value_sats": 21317381
+      },
+      {
+        "address": "bc1qy68y32flguxrjym2y2yuld369z5dmgrsk25c7e",
+        "index": 13,
+        "script_type": "p2wpkh",
+        "value_sats": 6734096
+      },
+      {
+        "address": "bc1q5sz7d9e087tc43mm45zdg44cjh7dzyd47k9wzs",
+        "index": 14,
+        "script_type": "p2wpkh",
+        "value_sats": 3366768
+      }
+    ],
+    "is_segwit": true,
+    "locktime": 0,
+    "output_count": 33,
+    "outputs": [
+      {
+        "address": "bc1qppx2q6j23fsrz3z47ug2q3t8mepkmac6vpn095",
+        "index": 0,
+        "script_type": "p2wpkh",
+        "value_sats": 28697814
+      },
+      {
+        "address": "bc1qfd806tm6lax5t3m6ld0a0snm2p4rcpccz6s6pn",
+        "index": 1,
+        "script_type": "p2wpkh",
+        "value_sats": 28697814
+      },
+      {
+        "address": "bc1qhvp8nfugvg0kjq6ktf9hejp5uu60pssq5l7s2w",
+        "index": 2,
+        "script_type": "p2wpkh",
+        "value_sats": 28697814
+      },
+      {
+        "address": "bc1qk0x4vuga7xz9cc53kz7lzrh9jvxhf9f30klq8y",
+        "index": 3,
+        "script_type": "p2wpkh",
+        "value_sats": 28697814
+      },
+      {
+        "address": "bc1q2d3qtp99e82w69hmdx27a0z43capvnf5cahgxq",
+        "index": 4,
+        "script_type": "p2wpkh",
+        "value_sats": 28697814
+      },
+      {
+        "address": "bc1qa3u805a2tfvm20hfav6djnrpety6c5hq0zv6sn",
+        "index": 5,
+        "script_type": "p2wpkh",
+        "value_sats": 28697814
+      },
+      {
+        "address": "bc1q2mam5f23fugf5w6z9pfp8scelld223n8p7aqan",
+        "index": 6,
+        "script_type": "p2wpkh",
+        "value_sats": 28697814
+      },
+      {
+        "address": "bc1qwklwy6hnutypw8747xavvqgkvlrduk8ee4nqpt",
+        "index": 7,
+        "script_type": "p2wpkh",
+        "value_sats": 28697814
+      },
+      {
+        "address": "bc1q7try3c95tewe5e8kg6ps8ahsp2c2u3030np99h",
+        "index": 8,
+        "script_type": "p2wpkh",
+        "value_sats": 20000000
+      },
+      {
+        "address": "bc1qwha8lpamkr82p6r2kgpeeawug4u07a5tvfxgek",
+        "index": 9,
+        "script_type": "p2wpkh",
+        "value_sats": 20000000
+      },
+      {
+        "address": "bc1qsnwv6svtgra3kkanksy8wn67vcnfs4jhhr4n6s",
+        "index": 10,
+        "script_type": "p2wpkh",
+        "value_sats": 20000000
+      },
+      {
+        "address": "bc1qrz4uf2zdjlpf3s8urryh8whjsk5yx48le90p48",
+        "index": 11,
+        "script_type": "p2wpkh",
+        "value_sats": 20000000
+      },
+      {
+        "address": "bc1qdxnfr0p4t3qvs7asg9chul594wgvy6nqgk6hvq",
+        "index": 12,
+        "script_type": "p2wpkh",
+        "value_sats": 20000000
+      },
+      {
+        "address": "bc1q6za94vvslmjzwaqz4mrwck6f0m8emv24vafel4",
+        "index": 13,
+        "script_type": "p2wpkh",
+        "value_sats": 20000000
+      },
+      {
+        "address": "bc1qppwehm6l7v046564843r6wr2rvgraqwdvw4x9f",
+        "index": 14,
+        "script_type": "p2wpkh",
+        "value_sats": 20000000
+      },
+      {
+        "address": "bc1qfq6zs8sndazjmcjcjd59xy9t7tcxhsd9hf7vha",
+        "index": 15,
+        "script_type": "p2wpkh",
+        "value_sats": 20000000
+      },
+      {
+        "address": "bc1q76q2tz7akpeawwj0sslyvjhx4kwhzedvky8jpp",
+        "index": 16,
+        "script_type": "p2wpkh",
+        "value_sats": 14348907
+      },
+      {
+        "address": "bc1qxmkazvyrx7hk3ldvls02p3yydm9k4hpm3mh5f8",
+        "index": 17,
+        "script_type": "p2wpkh",
+        "value_sats": 14348907
+      },
+      {
+        "address": "bc1qlzrw9v38dtdj9kukjfjta9fl5uwa73003fmr4w",
+        "index": 18,
+        "script_type": "p2wpkh",
+        "value_sats": 14348907
+      },
+      {
+        "address": "bc1qr5vmmtj85wwv9cchwcfgmrralfrcpc6h40mkxs",
+        "index": 19,
+        "script_type": "p2wpkh",
+        "value_sats": 14348907
+      },
+      {
+        "address": "bc1quackfqhk3v7cdle9m7uyv98ahfghqtypqf7esn",
+        "index": 20,
+        "script_type": "p2wpkh",
+        "value_sats": 14348907
+      },
+      {
+        "address": "bc1qhdmkcmxajza52q5c3dzxujwgm07lhwdh9xpxl9",
+        "index": 21,
+        "script_type": "p2wpkh",
+        "value_sats": 14348907
+      },
+      {
+        "address": "bc1qwtwldafy9zperxx79jpe0h7c7gwjhcyt7texaw",
+        "index": 22,
+        "script_type": "p2wpkh",
+        "value_sats": 14348907
+      },
+      {
+        "address": "bc1qk8dwcfju435ljtcy0zemug5l085hrz2etcy02g",
+        "index": 23,
+        "script_type": "p2wpkh",
+        "value_sats": 14348907
+      },
+      {
+        "address": "bc1qwgm74yxvjydpfrv94p4w0dakx7z2q8p0qq63jt",
+        "index": 24,
+        "script_type": "p2wpkh",
+        "value_sats": 10000000
+      },
+      {
+        "address": "bc1qxld0asykq23w7s0y0fzxknxef4u6urv28qynpj",
+        "index": 25,
+        "script_type": "p2wpkh",
+        "value_sats": 10000000
+      },
+      {
+        "address": "bc1qejdd0na03e6lk9v5fgxuzjcjy9w7cxam2usa2l",
+        "index": 26,
+        "script_type": "p2wpkh",
+        "value_sats": 10000000
+      },
+      {
+        "address": "bc1q2re45rt9fhw0xmszp3swjgdf3qsq6ydau2q5u7",
+        "index": 27,
+        "script_type": "p2wpkh",
+        "value_sats": 10000000
+      },
+      {
+        "address": "bc1qrsz6vrsam34fd7d6n06djc4l2kcve43x3rkg0s",
+        "index": 28,
+        "script_type": "p2wpkh",
+        "value_sats": 10000000
+      },
+      {
+        "address": "bc1qcj6335v3740yurf3yn5kq7tejrs4mae4sctpw9",
+        "index": 29,
+        "script_type": "p2wpkh",
+        "value_sats": 10000000
+      },
+      {
+        "address": "bc1q60udjxu7d30v4p3z62px0a8ud8kg6g6cd49g4c",
+        "index": 30,
+        "script_type": "p2wpkh",
+        "value_sats": 10000000
+      },
+      {
+        "address": "bc1q0llt4ru5pnd7fgu9a0qvle9qwz08sjl4jspeun",
+        "index": 31,
+        "script_type": "p2wpkh",
+        "value_sats": 10000000
+      },
+      {
+        "address": "bc1qtft0vknehnusy2jf70lyvru6jl8xqxdazlqlns",
+        "index": 32,
+        "script_type": "p2wpkh",
+        "value_sats": 5314553
+      }
+    ],
+    "privacy_score": 100,
+    "rbf_signaling": true,
+    "txid": "58ddf3064ed5b3419f225186927e4eeef12217cc66611f435a575e5c7c9c1fc7",
+    "vbytes": 2050,
+    "version": 2,
+    "weight": 8199
+  },
+  "ok": true
+}

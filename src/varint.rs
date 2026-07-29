@@ -165,3 +165,60 @@ pub fn read_compact_size_vec<R: Read>(r: &mut R, out: &mut Vec<u8>) -> io::Resul
         x => Ok(x as u64),
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::io::Cursor;
+
+    #[test]
+    fn read_compact_size_single_byte() {
+        // Values below 0xfd are encoded as a single byte with no prefix.
+        let mut c = Cursor::new(vec![0x00]);
+        assert_eq!(read_compact_size(&mut c).unwrap(), 0);
+
+        let mut c = Cursor::new(vec![0xfc]);
+        assert_eq!(read_compact_size(&mut c).unwrap(), 0xfc);
+    }
+
+    #[test]
+    fn read_compact_size_u16_prefix() {
+        // 0xfd prefix + 2-byte little-endian value.
+        let mut c = Cursor::new(vec![0xfd, 0x00, 0x01]);
+        assert_eq!(read_compact_size(&mut c).unwrap(), 0x0100);
+    }
+
+    #[test]
+    fn read_compact_size_u32_prefix() {
+        // 0xfe prefix + 4-byte little-endian value.
+        let mut c = Cursor::new(vec![0xfe, 0x00, 0x00, 0x01, 0x00]);
+        assert_eq!(read_compact_size(&mut c).unwrap(), 0x0001_0000);
+    }
+
+    #[test]
+    fn read_compact_size_u64_prefix() {
+        // 0xff prefix + 8-byte little-endian value.
+        let mut c = Cursor::new(vec![0xff, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00]);
+        assert_eq!(read_compact_size(&mut c).unwrap(), 0x0000_0001_0000_0000);
+    }
+
+    #[test]
+    fn compact_size_len_matches_encoding_width() {
+        assert_eq!(compact_size_len(0), 1);
+        assert_eq!(compact_size_len(0xfc), 1);
+        assert_eq!(compact_size_len(0xfd), 3);
+        assert_eq!(compact_size_len(0xffff), 3);
+        assert_eq!(compact_size_len(0x1_0000), 5);
+        assert_eq!(compact_size_len(0xffff_ffff), 5);
+        assert_eq!(compact_size_len(0x1_0000_0000), 9);
+    }
+
+    #[test]
+    fn read_compact_size_vec_mirrors_consumed_bytes() {
+        let mut out = Vec::new();
+        let mut c = Cursor::new(vec![0xfd, 0x34, 0x12]);
+        let v = read_compact_size_vec(&mut c, &mut out).unwrap();
+        assert_eq!(v, 0x1234);
+        assert_eq!(out, vec![0xfd, 0x34, 0x12]);
+    }
+}

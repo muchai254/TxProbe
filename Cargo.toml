@@ -3,6 +3,10 @@ name = "txprobe-analyzer"
 version = "0.1.0"
 edition = "2021"
 
+[lib]
+name = "txprobe_analyzer"
+path = "src/lib.rs"
+
 [[bin]]
 name = "txprobe-analyzer"
 path = "src/main.rs"

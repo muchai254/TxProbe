@@ -1,0 +1,110 @@
+{
+  "analysis": {
+    "classification": "simple_payment",
+    "fee_rate_sat_vb": 5.02,
+    "fee_sats": 1060,
+    "heuristics": {
+      "address_reuse": {
+        "detected": false
+      },
+      "batch_payment": {
+        "detected": false
+      },
+      "change_detection": {
+        "confidence": "medium",
+        "confidence_score": 0.7,
+        "contributing_signals": [
+          "script_type_matches_inputs",
+          "change_value_smaller_than_payment",
+          "typical_change_position"
+        ],
+        "detected": true,
+        "fee_constrained": false,
+        "likely_change_index": 1,
+        "method": "script_type_match"
+      },
+      "cioh": {
+        "detected": true
+      },
+      "coinjoin": {
+        "detected": false
+      },
+      "consolidation": {
+        "detected": false
+      },
+      "inscription": {
+        "detected": false
+      },
+      "locktime_analysis": {
+        "anti_fee_sniping": false,
+        "detected": true,
+        "locktime": 0,
+        "locktime_type": "none",
+        "rbf_signaling": true,
+        "wallet_fingerprint": "rbf_only"
+      },
+      "op_return": {
+        "detected": false
+      },
+      "peeling_chain": {
+        "detected": true
+      },
+      "round_number_payment": {
+        "detected": false
+      },
+      "script_type_upgrade": {
+        "detected": false
+      },
+      "self_transfer": {
+        "detected": false
+      },
+      "unnecessary_input": {
+        "confidence": "low",
+        "detected": true,
+        "note": "1 of 2 inputs could be removed without underfunding the outputs (total_in=378859 sat, total_out=377799 sat)",
+        "unnecessary_input_indices": [
+          0
+        ]
+      }
+    },
+    "input_count": 2,
+    "inputs": [
+      {
+        "address": "bc1qgyjh838f7lm4qz38u5ckkwumayxut6uxvhysuz",
+        "index": 0,
+        "script_type": "p2wpkh",
+        "value_sats": 368
+      },
+      {
+        "address": "bc1qnmwhu7k298l97tzdrrmfd7yktsm234nan33vcf",
+        "index": 1,
+        "script_type": "p2wpkh",
+        "value_sats": 378491
+      }
+    ],
+    "is_segwit": true,
+    "locktime": 0,
+    "output_count": 2,
+    "outputs": [
+      {
+        "address": "19xdMLA3DUyTo4242EYR87PsL2XoB7tFhZ",
+        "index": 0,
+        "script_type": "p2pkh",
+        "value_sats": 376456
+      },
+      {
+        "address": "bc1q9qpjmvcz3ymentay77yhwjmvc4ysaaczxyzzlr",
+        "index": 1,
+        "script_type": "p2wpkh",
+        "value_sats": 1343
+      }
+    ],
+    "privacy_score": 72,
+    "rbf_signaling": true,
+    "txid": "d8e203989286dbe60e00c9cea9ec5290c671429a8bfa1c835f5d255a8301790a",
+    "vbytes": 211,
+    "version": 2,
+    "weight": 844
+  },
+  "ok": true
+}

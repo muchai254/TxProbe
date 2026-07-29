@@ -1,0 +1,92 @@
+{
+  "analysis": {
+    "classification": "self_transfer",
+    "fee_rate_sat_vb": 4.24,
+    "fee_sats": 590,
+    "heuristics": {
+      "address_reuse": {
+        "detected": true
+      },
+      "batch_payment": {
+        "detected": false
+      },
+      "change_detection": {
+        "detected": false
+      },
+      "cioh": {
+        "detected": false
+      },
+      "coinjoin": {
+        "detected": false
+      },
+      "consolidation": {
+        "detected": false
+      },
+      "inscription": {
+        "detected": false
+      },
+      "locktime_analysis": {
+        "anti_fee_sniping": false,
+        "detected": true,
+        "locktime": 0,
+        "locktime_type": "none",
+        "rbf_signaling": true,
+        "wallet_fingerprint": "rbf_only"
+      },
+      "op_return": {
+        "detected": true,
+        "output_index": 0,
+        "payload_size": 16,
+        "protocol": "runes"
+      },
+      "peeling_chain": {
+        "detected": false
+      },
+      "round_number_payment": {
+        "detected": false
+      },
+      "script_type_upgrade": {
+        "detected": false
+      },
+      "self_transfer": {
+        "detected": true
+      },
+      "unnecessary_input": {
+        "detected": false
+      }
+    },
+    "input_count": 1,
+    "inputs": [
+      {
+        "address": "bc1p0lfpyxhy60dncakcghqwhpn7ntnj6tlvcz7ur3pau88pyztty2qsatuq55",
+        "index": 0,
+        "script_type": "p2tr",
+        "value_sats": 924547
+      }
+    ],
+    "is_segwit": true,
+    "locktime": 0,
+    "output_count": 2,
+    "outputs": [
+      {
+        "address": null,
+        "index": 0,
+        "script_type": "op_return",
+        "value_sats": 0
+      },
+      {
+        "address": "bc1p0lfpyxhy60dncakcghqwhpn7ntnj6tlvcz7ur3pau88pyztty2qsatuq55",
+        "index": 1,
+        "script_type": "p2tr",
+        "value_sats": 923957
+      }
+    ],
+    "privacy_score": 75,
+    "rbf_signaling": true,
+    "txid": "2b202b94624f555dcf50f45ae3b3080ab3f1bb75cc231b5d623bc448ea466424",
+    "vbytes": 139,
+    "version": 2,
+    "weight": 556
+  },
+  "ok": true
+}

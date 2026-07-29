@@ -127,3 +127,81 @@ pub fn address_from_script(script: &[u8]) -> Option<String> {
 
     None
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // Vectors below are cross-checked against an independent Python
+    // implementation of Base58Check / Bech32 / Bech32m, not against this
+    // module — self-consistency alone wouldn't catch a bug shared by both
+    // the encoder and its test.
+
+    #[test]
+    fn p2pkh_matches_known_genesis_address() {
+        // Hash160 from the genesis coinbase output; address is the famous
+        // 1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa.
+        let hash = hex::decode("62e907b15cbf27d5425399ebf6f0fb50ebb88f18").unwrap();
+        let mut script = vec![0x76, 0xa9, 0x14];
+        script.extend_from_slice(&hash);
+        script.extend_from_slice(&[0x88, 0xac]);
+        assert_eq!(
+            address_from_script(&script).as_deref(),
+            Some("1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa")
+        );
+    }
+
+    #[test]
+    fn p2sh_matches_base58check_vector() {
+        let hash = hex::decode("748284390f9e263a4b766a75d0633c50426eb875").unwrap();
+        let mut script = vec![0xa9, 0x14];
+        script.extend_from_slice(&hash);
+        script.push(0x87);
+        assert_eq!(
+            address_from_script(&script).as_deref(),
+            Some("3CK4fEwbMP7heJarmU4eqA3sMbVJyEnU3V")
+        );
+    }
+
+    #[test]
+    fn p2wpkh_matches_bech32_vector() {
+        let program = hex::decode("defac73d20f081234b1e0a56b9512d1dfbcfbdf2").unwrap();
+        let mut script = vec![0x00, 0x14];
+        script.extend_from_slice(&program);
+        assert_eq!(
+            address_from_script(&script).as_deref(),
+            Some("bc1qmmavw0fq7zqjxjc7pfttj5fdrhaul00jljn4f8")
+        );
+    }
+
+    #[test]
+    fn p2wsh_matches_bech32_vector() {
+        let program =
+            hex::decode("3247259a6a651e47051ec8e0c1f10fd2945653d9dfa2797ebcd0827e5ab306b1")
+                .unwrap();
+        let mut script = vec![0x00, 0x20];
+        script.extend_from_slice(&program);
+        assert_eq!(
+            address_from_script(&script).as_deref(),
+            Some("bc1qxfrjtxn2v50ywpg7ersvrug06229v57em738jl4u6zp8uk4nq6csppqral")
+        );
+    }
+
+    #[test]
+    fn p2tr_matches_bech32m_vector() {
+        let xonly =
+            hex::decode("b6a9b333ceea3aa65c0229764cc9cedc16c8ea0b4786f9266d1fa37841f8e737")
+                .unwrap();
+        let mut script = vec![0x51, 0x20];
+        script.extend_from_slice(&xonly);
+        assert_eq!(
+            address_from_script(&script).as_deref(),
+            Some("bc1pk65mxv7waga2vhqz99myejwwmstv36stg7r0jfndr73hss0cuumsu8d9lk")
+        );
+    }
+
+    #[test]
+    fn op_return_has_no_address() {
+        assert_eq!(address_from_script(&[0x6a, 0x00]), None);
+    }
+}

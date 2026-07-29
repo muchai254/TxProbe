@@ -1,0 +1,91 @@
+{
+  "analysis": {
+    "classification": "simple_payment",
+    "fee_rate_sat_vb": 11.11,
+    "fee_sats": 2311,
+    "heuristics": {
+      "address_reuse": {
+        "detected": false
+      },
+      "batch_payment": {
+        "detected": false
+      },
+      "change_detection": {
+        "detected": false
+      },
+      "cioh": {
+        "detected": false
+      },
+      "coinjoin": {
+        "detected": false
+      },
+      "consolidation": {
+        "detected": false
+      },
+      "inscription": {
+        "content_type": "\u0010",
+        "detected": true,
+        "protocol": "brc20"
+      },
+      "locktime_analysis": {
+        "anti_fee_sniping": false,
+        "detected": true,
+        "locktime": 0,
+        "locktime_type": "none",
+        "rbf_signaling": true,
+        "wallet_fingerprint": "rbf_only"
+      },
+      "op_return": {
+        "detected": false
+      },
+      "peeling_chain": {
+        "detected": true
+      },
+      "round_number_payment": {
+        "detected": false
+      },
+      "script_type_upgrade": {
+        "detected": false
+      },
+      "self_transfer": {
+        "detected": false
+      },
+      "unnecessary_input": {
+        "detected": false
+      }
+    },
+    "input_count": 1,
+    "inputs": [
+      {
+        "address": "bc1pu6yrvnr2el5khyl8pfarx2zx0cswjp578szqr07r7uugs2syhn3sp90j70",
+        "index": 0,
+        "script_type": "p2wsh",
+        "value_sats": 68767
+      }
+    ],
+    "is_segwit": true,
+    "locktime": 0,
+    "output_count": 2,
+    "outputs": [
+      {
+        "address": "bc1pflhqnucsa647usk4tku5puel33wl9dauvf4yg2ec9qex45pfrjdqnnup97",
+        "index": 0,
+        "script_type": "p2tr",
+        "value_sats": 388
+      },
+      {
+        "address": "bc1pee8gm5yzf3pxkvpdkgjpmc5p03rf7cxdzvqewz24jpn8jhx85ddql9sqqr",
+        "index": 1,
+        "script_type": "p2tr",
+        "value_sats": 66068
+      }
+    ],
+    "privacy_score": 100,
+    "rbf_signaling": true,
+    "txid": "32abe19c221f35d7721c271214de187a51be6981a686db77cdf84a7a691d50bd",
+    "vbytes": 208,
+    "version": 2,
+    "weight": 829
+  },
+  "ok": true
+}

@@ -1,15 +1,7 @@
-mod address;
-mod crypto;
-mod heuristics;
-mod script;
-mod tx;
-mod varint;
-
-use heuristics::{analyze_single_tx, PrevoutEntry};
 use serde::Deserialize;
 use serde_json::json;
 use std::io::{self, Read};
-use tx::parse_transaction;
+use txprobe_analyzer::{analyze_single_tx, parse_transaction, PrevoutEntry};
 
 #[derive(Deserialize)]
 struct Input {

@@ -1,0 +1,119 @@
+{
+  "analysis": {
+    "classification": "batch_payment",
+    "fee_rate_sat_vb": 128.6,
+    "fee_sats": 30735,
+    "heuristics": {
+      "address_reuse": {
+        "detected": false
+      },
+      "batch_payment": {
+        "detected": true,
+        "distinct_script_types": 3,
+        "output_count": 4
+      },
+      "change_detection": {
+        "confidence": "low",
+        "confidence_score": 0.35,
+        "contributing_signals": [
+          "change_value_smaller_than_payment",
+          "typical_change_position"
+        ],
+        "detected": true,
+        "fee_constrained": false,
+        "likely_change_index": 0,
+        "method": "value_analysis"
+      },
+      "cioh": {
+        "detected": false
+      },
+      "coinjoin": {
+        "detected": false
+      },
+      "consolidation": {
+        "detected": false
+      },
+      "inscription": {
+        "detected": false
+      },
+      "locktime_analysis": {
+        "anti_fee_sniping": false,
+        "detected": true,
+        "locktime": 0,
+        "locktime_type": "none",
+        "rbf_signaling": true,
+        "wallet_fingerprint": "rbf_only"
+      },
+      "op_return": {
+        "detected": false
+      },
+      "peeling_chain": {
+        "detected": false
+      },
+      "round_number_payment": {
+        "detected": false
+      },
+      "script_type_upgrade": {
+        "detected": true,
+        "from_types": [
+          "p2sh-p2wpkh"
+        ],
+        "to_types": [
+          "p2wpkh",
+          "p2wsh"
+        ]
+      },
+      "self_transfer": {
+        "detected": false
+      },
+      "unnecessary_input": {
+        "detected": false
+      }
+    },
+    "input_count": 1,
+    "inputs": [
+      {
+        "address": "35dRuVC98vzaMU2csyxGnw2YNidG38NMiv",
+        "index": 0,
+        "script_type": "p2sh-p2wpkh",
+        "value_sats": 1990000
+      }
+    ],
+    "is_segwit": true,
+    "locktime": 0,
+    "output_count": 4,
+    "outputs": [
+      {
+        "address": "bc1qlwyyh5xky6dflhc599nl82hq5k843gvxw4empf",
+        "index": 0,
+        "script_type": "p2wpkh",
+        "value_sats": 18596
+      },
+      {
+        "address": "bc1quer49s3509scwqcjrl0m93rdr85wz592eflv6z",
+        "index": 1,
+        "script_type": "p2wpkh",
+        "value_sats": 1463375
+      },
+      {
+        "address": "bc1qzehkcvj46zvsrzp4xzk58cqm94aa06cekpsu4w9kxg0d9fcqcygswtwu8h",
+        "index": 2,
+        "script_type": "p2wsh",
+        "value_sats": 365844
+      },
+      {
+        "address": "3KeHza5KBtZNHWyQT9j5Ak7QX9rHPNWMB1",
+        "index": 3,
+        "script_type": "p2sh",
+        "value_sats": 111450
+      }
+    ],
+    "privacy_score": 97,
+    "rbf_signaling": true,
+    "txid": "1c7bb3f36836bb060d21d49cb9d2d321026d9270c862a22864bbad2b000438c2",
+    "vbytes": 239,
+    "version": 2,
+    "weight": 953
+  },
+  "ok": true
+}

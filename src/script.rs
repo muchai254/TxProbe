@@ -423,3 +423,97 @@ pub fn classify_input_type(
         _ => "unknown",
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn classify_script_p2pkh() {
+        let mut s = vec![0x76, 0xa9, 0x14];
+        s.extend_from_slice(&[0u8; 20]);
+        s.extend_from_slice(&[0x88, 0xac]);
+        assert_eq!(classify_script(&s), "p2pkh");
+    }
+
+    #[test]
+    fn classify_script_p2sh() {
+        let mut s = vec![0xa9, 0x14];
+        s.extend_from_slice(&[0u8; 20]);
+        s.push(0x87);
+        assert_eq!(classify_script(&s), "p2sh");
+    }
+
+    #[test]
+    fn classify_script_p2wpkh() {
+        let mut s = vec![0x00, 0x14];
+        s.extend_from_slice(&[0u8; 20]);
+        assert_eq!(classify_script(&s), "p2wpkh");
+    }
+
+    #[test]
+    fn classify_script_p2wsh() {
+        let mut s = vec![0x00, 0x20];
+        s.extend_from_slice(&[0u8; 32]);
+        assert_eq!(classify_script(&s), "p2wsh");
+    }
+
+    #[test]
+    fn classify_script_p2tr() {
+        let mut s = vec![0x51, 0x20];
+        s.extend_from_slice(&[0u8; 32]);
+        assert_eq!(classify_script(&s), "p2tr");
+    }
+
+    #[test]
+    fn classify_script_op_return() {
+        assert_eq!(classify_script(&[0x6a]), "op_return");
+        assert_eq!(classify_script(&[0x6a, 0x00]), "op_return");
+    }
+
+    #[test]
+    fn classify_script_unknown() {
+        assert_eq!(classify_script(&[]), "unknown");
+        assert_eq!(classify_script(&[0x51, 0x02, 0xab, 0xcd]), "unknown");
+    }
+
+    #[test]
+    fn op_return_protocol_known_prefixes() {
+        assert_eq!(op_return_protocol(b"omni..."), "omni_layer");
+        assert_eq!(
+            op_return_protocol(&[0x01, 0x09, 0xf9, 0x11, 0x02, 0xff]),
+            "opentimestamps"
+        );
+        assert_eq!(op_return_protocol(b"CNTRPRTYxyz"), "counterparty");
+        assert_eq!(op_return_protocol(&[0x58, 0x32, 0xff]), "stacks");
+        assert_eq!(op_return_protocol(b"nothing-recognized"), "unknown");
+    }
+
+    #[test]
+    fn op_return_protocol_raw_detects_runestone_marker() {
+        // OP_RETURN OP_13 <data> — the Runestone protocol marker (script.rs:316).
+        let script = [0x6a, 0x5d, 0x02, 0xab, 0xcd];
+        assert_eq!(op_return_protocol_raw(&script), "runes");
+    }
+
+    #[test]
+    fn op_return_protocol_raw_falls_back_to_payload_sniffing() {
+        let mut script = vec![0x6a, 0x04];
+        script.extend_from_slice(b"omni");
+        assert_eq!(op_return_protocol_raw(&script), "omni_layer");
+    }
+
+    #[test]
+    fn op_return_protocol_raw_non_op_return_is_unknown() {
+        assert_eq!(op_return_protocol_raw(&[0x76, 0xa9]), "unknown");
+    }
+
+    #[test]
+    fn extract_op_return_payload_concatenates_pushes() {
+        let script = [0x6a, 0x02, 0xab, 0xcd, 0x02, 0xef, 0x01];
+        assert_eq!(
+            extract_op_return_payload(&script),
+            vec![0xab, 0xcd, 0xef, 0x01]
+        );
+    }
+}

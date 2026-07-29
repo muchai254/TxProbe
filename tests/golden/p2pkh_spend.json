@@ -1,0 +1,98 @@
+{
+  "analysis": {
+    "classification": "simple_payment",
+    "fee_rate_sat_vb": 49.46,
+    "fee_sats": 11078,
+    "heuristics": {
+      "address_reuse": {
+        "detected": true
+      },
+      "batch_payment": {
+        "detected": false
+      },
+      "change_detection": {
+        "confidence": "low",
+        "confidence_score": 0.4,
+        "contributing_signals": [
+          "script_type_matches_inputs",
+          "bip69_consistent"
+        ],
+        "detected": true,
+        "fee_constrained": false,
+        "likely_change_index": 1,
+        "method": "script_type_match"
+      },
+      "cioh": {
+        "detected": false
+      },
+      "coinjoin": {
+        "detected": false
+      },
+      "consolidation": {
+        "detected": false
+      },
+      "inscription": {
+        "detected": false
+      },
+      "locktime_analysis": {
+        "anti_fee_sniping": false,
+        "detected": true,
+        "locktime": 0,
+        "locktime_type": "none",
+        "rbf_signaling": true,
+        "wallet_fingerprint": "rbf_only"
+      },
+      "op_return": {
+        "detected": false
+      },
+      "peeling_chain": {
+        "detected": false
+      },
+      "round_number_payment": {
+        "detected": false
+      },
+      "script_type_upgrade": {
+        "detected": false
+      },
+      "self_transfer": {
+        "detected": false
+      },
+      "unnecessary_input": {
+        "detected": false
+      }
+    },
+    "input_count": 1,
+    "inputs": [
+      {
+        "address": "1EmbsCrqcGHxzt5h5cWETjTiBYuZ6c78u7",
+        "index": 0,
+        "script_type": "p2pkh",
+        "value_sats": 3737197
+      }
+    ],
+    "is_segwit": false,
+    "locktime": 0,
+    "output_count": 2,
+    "outputs": [
+      {
+        "address": "3K5huQV8gLZ5YNPkouPNTqrDW9mbUPLS78",
+        "index": 0,
+        "script_type": "p2sh",
+        "value_sats": 1672450
+      },
+      {
+        "address": "1EmbsCrqcGHxzt5h5cWETjTiBYuZ6c78u7",
+        "index": 1,
+        "script_type": "p2pkh",
+        "value_sats": 2053669
+      }
+    ],
+    "privacy_score": 72,
+    "rbf_signaling": true,
+    "txid": "89d5c732d5b1329448ae3c7e56ba779e90ea09b13dce545ac349ebbd33c85d5b",
+    "vbytes": 224,
+    "version": 2,
+    "weight": 896
+  },
+  "ok": true
+}

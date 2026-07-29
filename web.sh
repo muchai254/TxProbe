@@ -4,7 +4,10 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR"
 
-# Ensure zig-cc linker is available (used when gcc is not installed)
+# Ensure zig-cc linker is available (used when gcc is not installed).
+# No .cargo/config.toml is committed (it isn't portable across machines), so
+# the linker override is exported into the environment here instead — only
+# when this shell actually needs it.
 if ! command -v cc &>/dev/null && ! command -v gcc &>/dev/null; then
   if [ ! -f /tmp/zig-cc ]; then
     echo "==> No C compiler found. Setting up zig-cc linker..."
@@ -20,6 +23,7 @@ ZIGEOF
     chmod +x /tmp/zig-cc
     echo "    zig-cc ready."
   fi
+  export CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_LINKER=/tmp/zig-cc
 fi
 
 echo "==> Building Rust analyzer..."

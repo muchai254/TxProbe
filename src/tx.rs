@@ -158,3 +158,68 @@ pub fn parse_transaction(raw: &[u8]) -> Result<ParsedTx, Box<dyn std::error::Err
         input_scripts: Vec::new(),
     })
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // Vectors are hand-built minimal 1-in/1-out transactions with expected
+    // txid/wtxid/base_size/witness_size computed independently in Python
+    // (dsha256 over the same byte layout), not derived from this parser.
+
+    #[test]
+    fn parses_legacy_transaction() {
+        let raw = hex::decode(
+            "01000000010000000000000000000000000000000000000000000000000000000000000000\
+             ffffffff00ffffffff01e8030000000000001976a914000000000000000000000000000000\
+             000000000088ac00000000",
+        )
+        .unwrap();
+
+        let tx = parse_transaction(&raw).unwrap();
+
+        assert!(!tx.is_segwit);
+        assert_eq!(tx.version, 1);
+        assert_eq!(tx.locktime, 0);
+        assert_eq!(tx.inputs.len(), 1);
+        assert_eq!(tx.outputs.len(), 1);
+        assert_eq!(tx.outputs[0].value, 1000);
+        assert_eq!(tx.base_size, 85);
+        assert_eq!(tx.witness_size, 0);
+        assert_eq!(
+            hex::encode(tx.txid),
+            "e8fcaa0cb5fd8cc2aec29807f36447c3d45a5d33d63b32a812429095b1a766fa"
+        );
+        // Non-segwit: wtxid is dsha256 of the same bytes as txid.
+        assert_eq!(tx.txid, tx.wtxid);
+    }
+
+    #[test]
+    fn parses_segwit_transaction() {
+        let raw = hex::decode(
+            "010000000001010000000000000000000000000000000000000000000000000000000000000000\
+             ffffffff00ffffffff01e803000000000000160014000000000000000000000000000000000000\
+             000001010000000000",
+        )
+        .unwrap();
+
+        let tx = parse_transaction(&raw).unwrap();
+
+        assert!(tx.is_segwit);
+        assert_eq!(tx.inputs.len(), 1);
+        assert_eq!(tx.inputs[0].witness.len(), 1);
+        assert_eq!(tx.inputs[0].witness[0], vec![0x00]);
+        assert_eq!(tx.base_size, 82);
+        assert_eq!(tx.witness_size, 5);
+        assert_eq!(
+            hex::encode(tx.txid),
+            "9807013bc205602fc829ab582a1c3d09d87babcc246b58a8e4235827a9f25172"
+        );
+        assert_eq!(
+            hex::encode(tx.wtxid),
+            "803c6a5c5c2bb493628978284d78b625128cd04b1a937cc1b698aaaf4eaa5dbc"
+        );
+        // Segwit: txid (legacy hash) and wtxid (full hash) must differ.
+        assert_ne!(tx.txid, tx.wtxid);
+    }
+}

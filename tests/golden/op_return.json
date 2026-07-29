@@ -1,0 +1,133 @@
+{
+  "analysis": {
+    "classification": "consolidation",
+    "fee_rate_sat_vb": 20.69,
+    "fee_sats": 12018,
+    "heuristics": {
+      "address_reuse": {
+        "detected": false
+      },
+      "batch_payment": {
+        "detected": false
+      },
+      "change_detection": {
+        "detected": false
+      },
+      "cioh": {
+        "detected": true
+      },
+      "coinjoin": {
+        "detected": false
+      },
+      "consolidation": {
+        "detected": true
+      },
+      "inscription": {
+        "detected": false
+      },
+      "locktime_analysis": {
+        "anti_fee_sniping": false,
+        "detected": true,
+        "locktime": 0,
+        "locktime_type": "none",
+        "rbf_signaling": true,
+        "wallet_fingerprint": "rbf_only"
+      },
+      "op_return": {
+        "detected": true,
+        "output_index": 1,
+        "payload_size": 52,
+        "protocol": "unknown"
+      },
+      "peeling_chain": {
+        "detected": false
+      },
+      "round_number_payment": {
+        "detected": false
+      },
+      "script_type_upgrade": {
+        "detected": false
+      },
+      "self_transfer": {
+        "detected": false
+      },
+      "unnecessary_input": {
+        "confidence": "high",
+        "detected": true,
+        "note": "1 of 7 inputs could be removed without underfunding the outputs (total_in=36192018 sat, total_out=36180000 sat)",
+        "unnecessary_input_indices": [
+          0
+        ]
+      }
+    },
+    "input_count": 7,
+    "inputs": [
+      {
+        "address": "bc1qkvm9g5vz5tm5mh6nr8zd9qfeewzx9x40z0zqpk",
+        "index": 0,
+        "script_type": "p2wpkh",
+        "value_sats": 6763
+      },
+      {
+        "address": "bc1qkvm9g5vz5tm5mh6nr8zd9qfeewzx9x40z0zqpk",
+        "index": 1,
+        "script_type": "p2wpkh",
+        "value_sats": 4643703
+      },
+      {
+        "address": "bc1qkvm9g5vz5tm5mh6nr8zd9qfeewzx9x40z0zqpk",
+        "index": 2,
+        "script_type": "p2wpkh",
+        "value_sats": 2839132
+      },
+      {
+        "address": "bc1qkvm9g5vz5tm5mh6nr8zd9qfeewzx9x40z0zqpk",
+        "index": 3,
+        "script_type": "p2wpkh",
+        "value_sats": 761076
+      },
+      {
+        "address": "bc1qkvm9g5vz5tm5mh6nr8zd9qfeewzx9x40z0zqpk",
+        "index": 4,
+        "script_type": "p2wpkh",
+        "value_sats": 4230299
+      },
+      {
+        "address": "bc1qkvm9g5vz5tm5mh6nr8zd9qfeewzx9x40z0zqpk",
+        "index": 5,
+        "script_type": "p2wpkh",
+        "value_sats": 8010822
+      },
+      {
+        "address": "bc1qkvm9g5vz5tm5mh6nr8zd9qfeewzx9x40z0zqpk",
+        "index": 6,
+        "script_type": "p2wpkh",
+        "value_sats": 15700223
+      }
+    ],
+    "is_segwit": true,
+    "locktime": 0,
+    "output_count": 2,
+    "outputs": [
+      {
+        "address": "bc1q7t4vyehjsexdme84qhdgd4dawcn54djh0m78fz",
+        "index": 0,
+        "script_type": "p2wpkh",
+        "value_sats": 36180000
+      },
+      {
+        "address": null,
+        "index": 1,
+        "script_type": "op_return",
+        "value_sats": 0
+      }
+    ],
+    "privacy_score": 80,
+    "rbf_signaling": true,
+    "txid": "a59dc837c17f721bec89b7e88d96873e327b9584bf706b47401594f028493eed",
+    "vbytes": 581,
+    "version": 1,
+    "weight": 2321
+  },
+  "ok": true
+}

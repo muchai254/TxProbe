@@ -1,0 +1,99 @@
+{
+  "analysis": {
+    "classification": "simple_payment",
+    "fee_rate_sat_vb": 300.33,
+    "fee_sats": 42346,
+    "heuristics": {
+      "address_reuse": {
+        "detected": false
+      },
+      "batch_payment": {
+        "detected": false
+      },
+      "change_detection": {
+        "confidence": "medium",
+        "confidence_score": 0.6,
+        "contributing_signals": [
+          "script_type_matches_inputs",
+          "change_value_smaller_than_payment",
+          "bip69_consistent"
+        ],
+        "detected": true,
+        "fee_constrained": false,
+        "likely_change_index": 0,
+        "method": "script_type_match"
+      },
+      "cioh": {
+        "detected": false
+      },
+      "coinjoin": {
+        "detected": false
+      },
+      "consolidation": {
+        "detected": false
+      },
+      "inscription": {
+        "detected": false
+      },
+      "locktime_analysis": {
+        "anti_fee_sniping": false,
+        "detected": true,
+        "locktime": 960101,
+        "locktime_type": "block_height",
+        "rbf_signaling": true,
+        "wallet_fingerprint": "rbf_only"
+      },
+      "op_return": {
+        "detected": false
+      },
+      "peeling_chain": {
+        "detected": false
+      },
+      "round_number_payment": {
+        "detected": false
+      },
+      "script_type_upgrade": {
+        "detected": false
+      },
+      "self_transfer": {
+        "detected": false
+      },
+      "unnecessary_input": {
+        "detected": false
+      }
+    },
+    "input_count": 1,
+    "inputs": [
+      {
+        "address": "bc1qzajajtygdt5z48y28tpqmg0h78ctg77e2pd0g2",
+        "index": 0,
+        "script_type": "p2wpkh",
+        "value_sats": 1237546
+      }
+    ],
+    "is_segwit": true,
+    "locktime": 960101,
+    "output_count": 2,
+    "outputs": [
+      {
+        "address": "bc1qa2esw74z9fx9qa2zg8qqn5tujh5hrq6k7l83mg",
+        "index": 0,
+        "script_type": "p2wpkh",
+        "value_sats": 406000
+      },
+      {
+        "address": "bc1qq3kxmnr58wk7nqr0cfk4j6qrrkta867gtmjhdr",
+        "index": 1,
+        "script_type": "p2wpkh",
+        "value_sats": 789200
+      }
+    ],
+    "privacy_score": 97,
+    "rbf_signaling": true,
+    "txid": "1631c11e9a8e828a0f0dff8eec7496dbf137261caf20cd7ab81e073f751a7a87",
+    "vbytes": 141,
+    "version": 2,
+    "weight": 561
+  },
+  "ok": true
+}
