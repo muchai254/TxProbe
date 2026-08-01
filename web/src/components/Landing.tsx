@@ -9,7 +9,6 @@ import SampleChips from './landing/SampleChips'
 import FaqSection from './landing/FaqSection'
 import LandingFooter from './landing/LandingFooter'
 import Header from './Header'
-// @ts-ignore — JSX component, no type declarations needed
 import TextType from './TextType'
 
 interface LandingProps {
