@@ -38,7 +38,7 @@ export default function FindingsPanel({ score, heuristics, detectedCount }: Find
     <div
       className="slide-up"
       style={{
-        borderTop: '1px solid var(--color-border)',
+        borderTop: 'var(--border-hairline)',
         backgroundColor: 'var(--color-surface)',
         overflow: 'auto',
         flexShrink: 0,
@@ -52,11 +52,11 @@ export default function FindingsPanel({ score, heuristics, detectedCount }: Find
         gap: 'var(--space-4)',
         padding: '0 var(--space-6)',
         height: '72px',
-        borderBottom: '1px solid var(--color-border)',
+        borderBottom: 'var(--border-hairline)',
       }}>
         <PrivacyScoreRing score={score} size={48} animate={true} />
         <div>
-          <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '2px' }}>
+          <div className="label-micro" style={{ marginBottom: '2px' }}>
             Privacy Score
           </div>
           <div style={{ fontSize: 'var(--text-md)', fontWeight: 600 }}>
@@ -78,7 +78,7 @@ export default function FindingsPanel({ score, heuristics, detectedCount }: Find
       {/* Severity legend */}
       <div style={{
         padding: 'var(--space-2) var(--space-6)',
-        borderBottom: '1px solid var(--color-border)',
+        borderBottom: 'var(--border-hairline)',
         fontSize: 'var(--text-xs)',
         color: 'var(--color-text-muted)',
         fontStyle: 'italic',

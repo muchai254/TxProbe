@@ -19,7 +19,6 @@ export default function SampleChips({ loading, samples, onSampleClick }: SampleC
         <span style={{
           fontSize: 'var(--text-xs)',
           color: 'var(--color-text-muted)',
-          fontFamily: 'var(--font-mono)',
           flexShrink: 0,
           marginRight: '2px',
         }}>
@@ -31,7 +30,7 @@ export default function SampleChips({ loading, samples, onSampleClick }: SampleC
             <div key={i} style={{
               width: 112,
               height: 22,
-              border: '1px solid var(--color-border)',
+              border: 'var(--border-hairline)',
               borderRadius: 'var(--radius-sm)',
               backgroundColor: 'var(--color-border)',
               opacity: 0.5,
@@ -44,9 +43,8 @@ export default function SampleChips({ loading, samples, onSampleClick }: SampleC
               title={s}
               style={{
                 padding: '3px 8px',
-                fontFamily: 'var(--font-mono)',
                 fontSize: 'var(--text-xs)',
-                border: '1px solid var(--color-border)',
+                border: 'var(--border-hairline)',
                 borderRadius: 'var(--radius-sm)',
                 backgroundColor: 'var(--color-surface)',
                 color: 'var(--color-text-muted)',

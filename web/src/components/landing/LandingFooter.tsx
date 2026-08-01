@@ -1,7 +1,7 @@
 export default function LandingFooter() {
   return (
     <footer style={{
-      borderTop: '1px solid var(--color-border)',
+      borderTop: 'var(--border-hairline)',
       backgroundColor: 'var(--color-surface)',
       display: 'flex',
       alignItems: 'center',
@@ -10,7 +10,6 @@ export default function LandingFooter() {
       padding: '0 var(--space-6)',
     }}>
       <span style={{
-        fontFamily: 'var(--font-mono)',
         fontSize: 'var(--text-xs)',
         color: 'var(--color-text-muted)',
       }}>
@@ -22,7 +21,7 @@ export default function LandingFooter() {
           style={{
             color: 'var(--color-text)',
             textDecoration: 'none',
-            borderBottom: '1px solid var(--color-border)',
+            borderBottom: 'var(--border-hairline)',
             fontWeight: 500,
             transition: 'border-color var(--duration-fast)',
           }}

@@ -10,8 +10,8 @@ export default function SecondaryButton({ onClick, children }: SecondaryButtonPr
     <button
       onClick={onClick}
       style={{
-        fontFamily: 'var(--font-mono)', fontSize: 'var(--text-sm)',
-        padding: '6px 14px', border: '1px solid var(--color-border)',
+        fontSize: 'var(--text-sm)',
+        padding: '6px 14px', border: 'var(--border-hairline)',
         borderRadius: 'var(--radius-sm)', background: 'none', cursor: 'pointer',
         color: 'var(--color-text)',
       }}

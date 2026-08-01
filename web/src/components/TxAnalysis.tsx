@@ -65,7 +65,7 @@ export default function TxAnalysis({ txid, source, onBack }: Props) {
     return (
       <PageShell header={<Header onBack={onBack} backLabel={backLabel} contextId={txid} />}>
         <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 'var(--space-4)' }}>
-          <p style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--text-base)', color: 'var(--color-text-muted)', margin: 0 }}>
+          <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text-muted)', margin: 0 }}>
             {state.message}
           </p>
           <SecondaryButton onClick={() => window.location.reload()}>Retry</SecondaryButton>

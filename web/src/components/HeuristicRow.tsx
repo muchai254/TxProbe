@@ -30,7 +30,7 @@ export default function HeuristicRow({ id, result, expanded, onToggle }: Heurist
   const colors = SEVERITY_COLORS[meta.severity]
 
   return (
-    <div style={{ borderBottom: '1px solid var(--color-border)' }}>
+    <div style={{ borderBottom: 'var(--border-hairline)' }}>
       <button
         onClick={onToggle}
         style={{
@@ -44,23 +44,25 @@ export default function HeuristicRow({ id, result, expanded, onToggle }: Heurist
           border: 'none',
           cursor: 'pointer',
           textAlign: 'left',
-          fontFamily: 'var(--font-mono)',
         }}
       >
         {/* Chip */}
-        <span style={{
-          fontSize: 'var(--text-xs)',
-          fontWeight: 600,
-          padding: '2px 6px',
-          borderRadius: '3px',
-          border: `1px solid ${isDetected ? 'var(--color-signal)' : 'var(--color-border)'}`,
-          backgroundColor: isDetected ? 'var(--color-signal-low)' : 'transparent',
-          color: isDetected ? 'var(--color-signal)' : 'var(--color-text-muted)',
-          flexShrink: 0,
-          minWidth: '46px',
-          textAlign: 'center',
-          marginTop: isDetected ? '1px' : 0,
-        }}>
+        <span
+          className={isDetected ? 'chip-signal' : undefined}
+          style={{
+            fontSize: 'var(--text-xs)',
+            fontWeight: 600,
+            padding: '2px 6px',
+            borderRadius: '3px',
+            border: isDetected ? undefined : 'var(--border-hairline)',
+            backgroundColor: isDetected ? undefined : 'transparent',
+            color: isDetected ? undefined : 'var(--color-text-muted)',
+            flexShrink: 0,
+            minWidth: '46px',
+            textAlign: 'center',
+            marginTop: isDetected ? '1px' : 0,
+          }}
+        >
           {meta.chip}
         </span>
 
@@ -127,7 +129,7 @@ export default function HeuristicRow({ id, result, expanded, onToggle }: Heurist
               display: 'flex',
               flexDirection: 'column',
               gap: 'var(--space-4)',
-              backgroundColor: '#FAFAFA',
+              backgroundColor: 'var(--color-surface-subtle)',
             }}>
               <Section label="What was detected" text={meta.detected} />
               <Section label="What an observer learns" text={meta.observerLearns} />
@@ -143,7 +145,7 @@ export default function HeuristicRow({ id, result, expanded, onToggle }: Heurist
 function Section({ label, text }: { label: string; text: string }) {
   return (
     <div>
-      <p style={{ margin: '0 0 4px', fontSize: 'var(--text-xs)', color: 'var(--color-text-muted)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+      <p className="label-micro" style={{ margin: '0 0 4px', fontWeight: 600 }}>
         {label}
       </p>
       <p style={{ margin: 0, fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.6 }}>

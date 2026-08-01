@@ -118,7 +118,7 @@ export default function AddressAnalysis({ address, onBack, onTxClick }: Props) {
           flexDirection: 'column', gap: 'var(--space-4)',
         }}>
           <p style={{
-            fontFamily: 'var(--font-mono)', fontSize: 'var(--text-base)',
+            fontSize: 'var(--text-base)',
             color: 'var(--color-text-muted)', margin: 0, maxWidth: '400px',
             textAlign: 'center', lineHeight: 1.6,
           }}>

@@ -34,7 +34,7 @@ export default function TransactionTimeline({
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
       <div style={{
         padding: 'var(--space-3) var(--space-6)',
-        borderBottom: '1px solid var(--color-border)',
+        borderBottom: 'var(--border-hairline)',
         display: 'flex',
         gap: 'var(--space-2)',
         flexWrap: 'wrap',
@@ -53,7 +53,6 @@ export default function TransactionTimeline({
               backgroundColor: activeFilter === id ? 'var(--color-text)' : 'transparent',
               color: activeFilter === id ? 'var(--color-surface)' : 'var(--color-text-muted)',
               cursor: 'pointer',
-              fontFamily: 'var(--font-mono)',
               transition: 'all var(--duration-fast)',
             }}
           >
@@ -69,7 +68,7 @@ export default function TransactionTimeline({
         padding: '0 var(--space-6)',
         height: '36px',
         alignItems: 'center',
-        borderBottom: '1px solid var(--color-border)',
+        borderBottom: 'var(--border-hairline)',
         flexShrink: 0,
       }}>
         {['HEIGHT', 'TXID', 'SCORE', 'FLAGS'].map(h => (
@@ -98,19 +97,19 @@ export default function TransactionTimeline({
                 padding: '0 var(--space-6)',
                 height: '44px',
                 alignItems: 'center',
-                borderBottom: '1px solid var(--color-border)',
+                borderBottom: 'var(--border-hairline)',
                 cursor: 'pointer',
                 opacity: isFiltered ? 0.3 : 1,
                 transition: 'opacity var(--duration-fast), background-color var(--duration-fast)',
                 animationDelay: `${idx * 20}ms`,
               }}
-              onMouseEnter={e => { e.currentTarget.style.backgroundColor = '#F4F3F1' }}
+              onMouseEnter={e => { e.currentTarget.style.backgroundColor = 'var(--color-hover-row)' }}
               onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'transparent' }}
             >
               <span style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-muted)' }}>
                 {tx.block_height > 0 ? tx.block_height.toLocaleString() : '—'}
               </span>
-              <span style={{ fontSize: 'var(--text-sm)', fontFamily: 'var(--font-mono)' }}>
+              <span style={{ fontSize: 'var(--text-sm)' }}>
                 {truncId}
               </span>
               <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
@@ -121,14 +120,11 @@ export default function TransactionTimeline({
               </div>
               <div style={{ display: 'flex', gap: '4px', alignItems: 'center', justifyContent: 'flex-end' }}>
                 {tx.detected_heuristics.slice(0, 3).map(h => (
-                  <span key={h} style={{
+                  <span key={h} className="chip-signal" style={{
                     fontSize: '9px',
                     padding: '1px 4px',
                     borderRadius: '2px',
-                    border: '1px solid var(--color-signal)',
-                    color: 'var(--color-signal)',
                     fontWeight: 700,
-                    backgroundColor: 'var(--color-signal-low)',
                   }}>
                     {getHeuristic(h).chip}
                   </span>
@@ -147,7 +143,6 @@ export default function TransactionTimeline({
             <button
               onClick={onLoadMore}
               style={{
-                fontFamily: 'var(--font-mono)',
                 fontSize: 'var(--text-sm)',
                 color: 'var(--color-text-muted)',
                 background: 'none',

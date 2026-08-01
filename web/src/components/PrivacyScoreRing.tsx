@@ -65,7 +65,6 @@ export default function PrivacyScoreRing({ score, size = 80, animate = true }: P
         gap: '2px',
       }}>
         <span style={{
-          fontFamily: 'var(--font-mono)',
           fontSize: size >= 64 ? 'var(--text-xl)' : 'var(--text-md)',
           fontWeight: 600,
           color: isClean ? 'var(--color-text)' : 'var(--color-signal)',
@@ -75,7 +74,6 @@ export default function PrivacyScoreRing({ score, size = 80, animate = true }: P
         </span>
         {showLabel && (
           <span style={{
-            fontFamily: 'var(--font-mono)',
             fontSize: '9px',
             color: isClean ? 'var(--color-text-muted)' : 'var(--color-signal)',
             lineHeight: 1,

@@ -4,7 +4,7 @@ import { FAQ_ITEMS } from './content'
 export default function FaqSection() {
   return (
     <section style={{
-      borderTop: '1px solid var(--color-border)',
+      borderTop: 'var(--border-hairline)',
       backgroundColor: 'var(--color-surface)',
       display: 'flex',
       justifyContent: 'center',
@@ -13,7 +13,6 @@ export default function FaqSection() {
       <div style={{ width: '100%', maxWidth: '640px' }}>
         <p style={{
           margin: '0 0 var(--space-6)',
-          fontFamily: 'var(--font-mono)',
           fontSize: 'var(--text-xs)',
           color: 'var(--color-text-muted)',
           textTransform: 'uppercase',

@@ -32,7 +32,6 @@ export default function SearchInput({ mode, value, error, shaking, onChange, onK
           height: '52px',
           paddingLeft: '42px',
           paddingRight: '16px',
-          fontFamily: 'var(--font-mono)',
           fontSize: '15px',
           border: `1px solid ${error ? 'var(--color-signal)' : 'var(--color-border)'}`,
           borderRadius: 'var(--radius-sm)',

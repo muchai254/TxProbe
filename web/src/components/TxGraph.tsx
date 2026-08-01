@@ -96,7 +96,7 @@ export default function TxGraph({
       <svg
         width={svgWidth}
         height={svgHeight}
-        style={{ maxWidth: '100%', fontFamily: 'var(--font-mono)' }}
+        style={{ maxWidth: '100%' }}
       >
         {visibleInputs.map((_, i) => {
           const y = inputY(i) + NODE_H / 2

@@ -6,7 +6,7 @@ const Accordion = AccordionPrimitive.Root
 function AccordionItem({ children, ...props }: React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Item>) {
   return (
     <AccordionPrimitive.Item
-      style={{ borderBottom: '1px solid var(--color-border)' }}
+      style={{ borderBottom: 'var(--border-hairline)' }}
       {...props}
     >
       {children}
@@ -26,7 +26,6 @@ function AccordionTrigger({ children, ...props }: React.ComponentPropsWithoutRef
           justifyContent: 'space-between',
           gap: 'var(--space-4)',
           padding: 'var(--space-4) 0',
-          fontFamily: 'var(--font-mono)',
           fontSize: 'var(--text-sm)',
           color: 'var(--color-text)',
           background: 'none',
@@ -58,7 +57,6 @@ function AccordionContent({ children, ...props }: React.ComponentPropsWithoutRef
     >
       <div style={{
         paddingBottom: 'var(--space-4)',
-        fontFamily: 'var(--font-mono)',
         fontSize: 'var(--text-sm)',
         color: 'var(--color-text-muted)',
         lineHeight: 1.7,

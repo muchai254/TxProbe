@@ -18,7 +18,7 @@ export default function AddressSummary({ address, stats, onWorstLeakClick }: Add
     <div style={{
       width: '300px',
       flexShrink: 0,
-      borderRight: '1px solid var(--color-border)',
+      borderRight: 'var(--border-hairline)',
       backgroundColor: 'var(--color-surface)',
       padding: 'var(--space-6)',
       overflowY: 'auto',
@@ -30,7 +30,7 @@ export default function AddressSummary({ address, stats, onWorstLeakClick }: Add
       <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-4)' }}>
         <PrivacyScoreRing score={stats.overall_score} size={80} animate={true} />
         <div>
-          <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '4px' }}>
+          <div className="label-micro" style={{ marginBottom: '4px' }}>
             Privacy Score
           </div>
           <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-muted)' }}>
@@ -41,10 +41,10 @@ export default function AddressSummary({ address, stats, onWorstLeakClick }: Add
 
       {/* Address (truncated) */}
       <div>
-        <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-muted)', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+        <div className="label-micro" style={{ marginBottom: '4px' }}>
           Address
         </div>
-        <div style={{ fontSize: 'var(--text-xs)', fontFamily: 'var(--font-mono)', color: 'var(--color-text)', wordBreak: 'break-all', lineHeight: 1.6 }}>
+        <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text)', wordBreak: 'break-all', lineHeight: 1.6 }}>
           {address}
         </div>
       </div>
@@ -54,14 +54,14 @@ export default function AddressSummary({ address, stats, onWorstLeakClick }: Add
 
       {worstTxShort && (
         <div>
-          <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-muted)', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+          <div className="label-micro" style={{ marginBottom: '4px' }}>
             Worst privacy leak
           </div>
           <button
             onClick={() => onWorstLeakClick(stats.worst_tx)}
             style={{
               background: 'none', border: 'none', cursor: 'pointer',
-              fontFamily: 'var(--font-mono)', fontSize: 'var(--text-sm)',
+              fontSize: 'var(--text-sm)',
               color: 'var(--color-signal)', textDecoration: 'underline',
               padding: 0, display: 'flex', alignItems: 'center', gap: '4px',
             }}
@@ -74,16 +74,13 @@ export default function AddressSummary({ address, stats, onWorstLeakClick }: Add
 
       {chipLabel && (
         <div>
-          <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-muted)', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+          <div className="label-micro" style={{ marginBottom: '4px' }}>
             Most frequent heuristic
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
-            <span style={{
+            <span className="chip-signal" style={{
               fontSize: 'var(--text-xs)', fontWeight: 700,
               padding: '2px 8px', borderRadius: '3px',
-              border: '1px solid var(--color-signal)',
-              backgroundColor: 'var(--color-signal-low)',
-              color: 'var(--color-signal)',
             }}>
               {chipLabel}
             </span>
@@ -100,7 +97,7 @@ export default function AddressSummary({ address, stats, onWorstLeakClick }: Add
 function StatRow({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-muted)', marginBottom: '2px', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+      <div className="label-micro" style={{ marginBottom: '2px' }}>
         {label}
       </div>
       <div style={{ fontSize: 'var(--text-md)', fontWeight: 600 }}>{value}</div>

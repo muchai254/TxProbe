@@ -4,7 +4,7 @@ type Severity = HeuristicMeta['severity'];
 
 export const SEVERITY_COLORS: Record<Severity, { text: string; bg: string }> = {
   high: { text: 'var(--color-signal)', bg: 'var(--color-signal-low)' },
-  medium: { text: '#D97706', bg: 'rgba(217,119,6,0.12)' },
+  medium: { text: 'var(--color-severity-medium)', bg: 'var(--color-severity-medium-low)' },
   low: { text: 'var(--color-text-muted)', bg: 'transparent' },
   info: { text: 'var(--color-text-muted)', bg: 'transparent' },
 };

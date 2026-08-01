@@ -34,7 +34,7 @@ export default function Header({
       style={{
         height: '48px',
         backgroundColor: 'var(--color-surface)',
-        borderBottom: '1px solid var(--color-border)',
+        borderBottom: 'var(--border-hairline)',
         display: 'grid',
         gridTemplateColumns: '1fr auto 1fr',
         alignItems: 'center',
@@ -55,7 +55,6 @@ export default function Header({
               border: 'none',
               cursor: 'pointer',
               color: 'var(--color-text-muted)',
-              fontFamily: 'var(--font-mono)',
               fontSize: 'var(--text-sm)',
               padding: '4px 8px 4px 0',
             }}
@@ -75,7 +74,7 @@ export default function Header({
         {contextId && (
           <>
             <span style={{ color: 'var(--color-text-muted)' }}>·</span>
-            <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-muted)', fontFamily: 'var(--font-mono)' }}>
+            <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-muted)' }}>
               {truncateId(contextId)}
             </span>
           </>

@@ -106,7 +106,6 @@ export default function Landing({ onTxSubmit, onAddressSubmit }: LandingProps) {
             cursorCharacter="|"
             textColors={TYPING_COLORS}
             style={{
-              fontFamily: 'var(--font-mono)',
               fontSize: 'clamp(18px, 3vw, 28px)',
               lineHeight: 1.4,
               textAlign: 'center',
@@ -141,7 +140,6 @@ export default function Landing({ onTxSubmit, onAddressSubmit }: LandingProps) {
                   borderBottom: mode === m ? '1px solid var(--color-text)' : '1px solid transparent',
                   padding: '4px 0 6px 0',
                   cursor: 'pointer',
-                  fontFamily: 'var(--font-mono)',
                   fontSize: 'var(--text-sm)',
                   color: mode === m ? 'var(--color-text)' : 'var(--color-text-muted)',
                   fontWeight: mode === m ? 600 : 400,
@@ -185,7 +183,6 @@ export default function Landing({ onTxSubmit, onAddressSubmit }: LandingProps) {
                 alignItems: 'center',
                 gap: 'var(--space-2)',
                 padding: '8px 16px',
-                fontFamily: 'var(--font-mono)',
                 fontSize: 'var(--text-sm)',
                 border: '1px solid var(--color-text)',
                 borderRadius: 'var(--radius-sm)',

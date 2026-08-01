@@ -25,7 +25,6 @@ export function TxLoadingState({ phase }: TxLoadingProps) {
       flexDirection: 'column',
       alignItems: 'flex-start',
       gap: 'var(--space-3)',
-      fontFamily: 'var(--font-mono)',
       fontSize: 'var(--text-sm)',
       color: 'var(--color-text-muted)',
       padding: 'var(--space-8)',
@@ -70,7 +69,6 @@ export function WalletLoadingState({ phase, fetchProgress, analysisProgress }: W
       flexDirection: 'column',
       alignItems: 'flex-start',
       gap: 'var(--space-4)',
-      fontFamily: 'var(--font-mono)',
       fontSize: 'var(--text-sm)',
       padding: 'var(--space-8)',
     }}>
