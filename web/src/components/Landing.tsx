@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Search, ArrowRight, Fingerprint } from 'lucide-react'
 import type { AppMode } from '../lib/types'
 import { fetchSamples } from '../lib/api'
+import { truncateId } from '../lib/format'
 // @ts-ignore — JSX component, no type declarations needed
 import TextType from './TextType'
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from './ui/Accordion'
@@ -72,10 +73,6 @@ function validateAddress(s: string): string | null {
     return 'Enter a valid mainnet Bitcoin address (starts with 1, 3, or bc1).'
   }
   return null
-}
-
-function truncate(s: string): string {
-  return `${s.slice(0, 8)}...${s.slice(-6)}`
 }
 
 interface Samples {
@@ -314,7 +311,7 @@ export default function Landing({ onTxSubmit, onAddressSubmit }: LandingProps) {
                       e.currentTarget.style.color = 'var(--color-text-muted)'
                     }}
                   >
-                    {truncate(s)}
+                    {truncateId(s, 8, 6)}
                   </button>
                 ))
             }

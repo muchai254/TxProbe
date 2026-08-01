@@ -1,5 +1,6 @@
 import { ArrowLeft, Copy, ExternalLink, Check, Fingerprint } from 'lucide-react'
 import { useState } from 'react'
+import { truncateId } from '../lib/format'
 
 interface HeaderProps {
   onBack?: () => void;
@@ -8,11 +9,6 @@ interface HeaderProps {
   showCopy?: boolean;
   showExternal?: boolean;
   externalUrl?: string;
-}
-
-function truncate(s: string): string {
-  if (!s) return ''
-  return `${s.slice(0, 10)}...${s.slice(-6)}`
 }
 
 export default function Header({
@@ -80,7 +76,7 @@ export default function Header({
           <>
             <span style={{ color: 'var(--color-text-muted)' }}>·</span>
             <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-muted)', fontFamily: 'var(--font-mono)' }}>
-              {truncate(contextId)}
+              {truncateId(contextId)}
             </span>
           </>
         )}

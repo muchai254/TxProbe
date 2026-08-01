@@ -1,8 +1,10 @@
 import { useState } from 'react'
 import type { HeuristicId, HeuristicResult } from '../lib/types'
 import { HEURISTIC_LIST } from '../lib/heuristics'
+import { SEVERITY_SUMMARY_LABELS } from '../lib/severity'
+import { getScoreLabel, isCleanScore } from '../lib/score'
 import HeuristicRow from './HeuristicRow'
-import PrivacyScoreRing, { getScoreLabel } from './PrivacyScoreRing'
+import PrivacyScoreRing from './PrivacyScoreRing'
 
 interface FindingsPanelProps {
   score: number;
@@ -25,13 +27,12 @@ export default function FindingsPanel({ score, heuristics, detectedCount }: Find
     { high: 0, medium: 0, low: 0 }
   )
 
-  const severityLabel = [
-    severityCounts.high > 0 ? `${severityCounts.high} serious` : '',
-    severityCounts.medium > 0 ? `${severityCounts.medium} notable` : '',
-    severityCounts.low > 0 ? `${severityCounts.low} minor` : '',
-  ].filter(Boolean).join(' · ')
+  const severityLabel = (['high', 'medium', 'low'] as const)
+    .map(sev => severityCounts[sev] > 0 ? `${severityCounts[sev]} ${SEVERITY_SUMMARY_LABELS[sev]}` : '')
+    .filter(Boolean)
+    .join(' · ')
 
-  const isClean = score >= 80
+  const isClean = isCleanScore(score)
 
   return (
     <div

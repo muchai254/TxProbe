@@ -2,26 +2,13 @@ import { ChevronDown, ChevronUp } from 'lucide-react'
 import { useRef, useState, useLayoutEffect } from 'react'
 import type { HeuristicId, HeuristicResult } from '../lib/types'
 import { getHeuristic } from '../lib/heuristics'
+import { SEVERITY_COLORS, SEVERITY_LABELS } from '../lib/severity'
 
 interface HeuristicRowProps {
   id: HeuristicId;
   result: HeuristicResult;
   expanded: boolean;
   onToggle: () => void;
-}
-
-const SEVERITY_COLORS: Record<string, { text: string; bg: string }> = {
-  high: { text: 'var(--color-signal)', bg: 'var(--color-signal-low)' },
-  medium: { text: '#D97706', bg: 'rgba(217,119,6,0.12)' },
-  low: { text: 'var(--color-text-muted)', bg: 'transparent' },
-  info: { text: 'var(--color-text-muted)', bg: 'transparent' },
-}
-
-const SEVERITY_LABELS: Record<string, string> = {
-  high: 'Serious',
-  medium: 'Notable',
-  low: 'Minor',
-  info: 'Noted',
 }
 
 function truncateTeaser(text: string, max = 68): string {
@@ -40,7 +27,7 @@ export default function HeuristicRow({ id, result, expanded, onToggle }: Heurist
   }, [expanded])
 
   const isDetected = result.detected
-  const colors = SEVERITY_COLORS[meta.severity] || SEVERITY_COLORS.info
+  const colors = SEVERITY_COLORS[meta.severity]
 
   return (
     <div style={{ borderBottom: '1px solid var(--color-border)' }}>
@@ -112,7 +99,7 @@ export default function HeuristicRow({ id, result, expanded, onToggle }: Heurist
             flexShrink: 0,
             marginTop: '1px',
           }}>
-            {SEVERITY_LABELS[meta.severity] || meta.severity}
+            {SEVERITY_LABELS[meta.severity]}
           </span>
         ) : (
           <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-muted)', flexShrink: 0 }}>—</span>

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import type { TxInput, TxOutput, HeuristicId, HeuristicResult } from '../lib/types'
 import { getHeuristic } from '../lib/heuristics'
+import { formatSats } from '../lib/format'
 
 interface TxGraphProps {
   inputs: TxInput[];
@@ -16,11 +17,6 @@ const TX_W = 88;
 const TX_H = 88;
 const NODE_RADIUS = 4;
 const MAX_NODES = 8;
-
-function formatSats(sats: number): string {
-  if (sats >= 100_000_000) return `${(sats / 100_000_000).toFixed(4)} BTC`
-  return `${sats.toLocaleString()} sat`
-}
 
 export default function TxGraph({
   inputs,

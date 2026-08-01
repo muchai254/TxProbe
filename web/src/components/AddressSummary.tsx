@@ -2,6 +2,7 @@ import PrivacyScoreRing from './PrivacyScoreRing'
 import { ArrowUpRight } from 'lucide-react'
 import type { AddressStats } from '../lib/types'
 import { getHeuristic } from '../lib/heuristics'
+import { truncateId } from '../lib/format'
 
 interface AddressSummaryProps {
   address: string;
@@ -11,9 +12,7 @@ interface AddressSummaryProps {
 
 export default function AddressSummary({ address, stats, onWorstLeakClick }: AddressSummaryProps) {
   const chipLabel = getHeuristic(stats.most_frequent_heuristic).chip
-  const worstTxShort = stats.worst_tx
-    ? `${stats.worst_tx.slice(0, 8)}...${stats.worst_tx.slice(-6)}`
-    : null
+  const worstTxShort = stats.worst_tx ? truncateId(stats.worst_tx, 8, 6) : null
 
   return (
     <div style={{

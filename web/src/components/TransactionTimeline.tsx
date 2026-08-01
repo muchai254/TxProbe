@@ -1,6 +1,8 @@
 import { ChevronRight } from 'lucide-react'
 import type { TxSummary, HeuristicId } from '../lib/types'
 import { getHeuristic, HEURISTIC_IDS } from '../lib/heuristics'
+import { truncateId } from '../lib/format'
+import { isLowScore } from '../lib/score'
 
 interface TransactionTimelineProps {
   transactions: TxSummary[];
@@ -78,9 +80,9 @@ export default function TransactionTimeline({
       <div style={{ flex: 1, overflowY: 'auto' }}>
         {visible.map((tx, idx) => {
           const isFiltered = activeFilter !== null && !tx.detected_heuristics.includes(activeFilter)
-          const truncId = `${tx.txid.slice(0, 10)}...${tx.txid.slice(-6)}`
+          const truncId = truncateId(tx.txid)
           const scoreW = Math.round((tx.privacy_score / 100) * 80)
-          const isLow = tx.privacy_score < 50
+          const isLow = isLowScore(tx.privacy_score)
 
           return (
             <div
