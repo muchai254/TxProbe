@@ -29,10 +29,6 @@ pub struct ParsedTx {
 
     pub base_size: usize,
     pub witness_size: usize,
-
-    pub input_values: Vec<u64>,
-
-    pub input_scripts: Vec<Vec<u8>>,
 }
 
 // Parse a raw transaction from a byte slice.
@@ -150,8 +146,6 @@ pub fn parse_transaction(raw: &[u8]) -> Result<ParsedTx, Box<dyn std::error::Err
         txid,
         base_size,
         witness_size,
-        input_values: Vec::new(),
-        input_scripts: Vec::new(),
     })
 }
 

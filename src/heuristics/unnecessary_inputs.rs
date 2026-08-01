@@ -1,20 +1,21 @@
 // Unnecessary inputs detection heuristic
 
-use crate::tx::ParsedTx;
 use serde_json::{json, Value};
 
 use super::common::not_detected;
+use super::shared::TxContext;
 
-pub fn detect_unnecessary_inputs(tx: &ParsedTx, is_coinbase: bool) -> Value {
-    if is_coinbase {
+pub fn detect_unnecessary_inputs(ctx: &TxContext) -> Value {
+    let tx = ctx.tx;
+    if ctx.is_coinbase {
         return not_detected();
     }
 
-    if tx.input_values.is_empty() {
+    if ctx.input_values.is_empty() {
         return not_detected();
     }
 
-    if tx.inputs.len() != tx.input_values.len() {
+    if tx.inputs.len() != ctx.input_values.len() {
         return not_detected();
     }
 
@@ -22,7 +23,7 @@ pub fn detect_unnecessary_inputs(tx: &ParsedTx, is_coinbase: bool) -> Value {
         return not_detected();
     }
 
-    let total_inputs: u64 = tx.input_values.iter().sum();
+    let total_inputs: u64 = ctx.input_values.iter().sum();
     let total_outputs: u64 = tx.outputs.iter().map(|o| o.value).sum();
 
     if total_inputs < total_outputs {
@@ -30,7 +31,7 @@ pub fn detect_unnecessary_inputs(tx: &ParsedTx, is_coinbase: bool) -> Value {
     }
 
     let mut unnecessary: Vec<usize> = Vec::new();
-    for (i, &inp_val) in tx.input_values.iter().enumerate() {
+    for (i, &inp_val) in ctx.input_values.iter().enumerate() {
         let remaining = total_inputs.saturating_sub(inp_val);
         if remaining >= total_outputs {
             unnecessary.push(i);

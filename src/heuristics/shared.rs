@@ -5,7 +5,7 @@
 use crate::address::address_from_script;
 use crate::crypto::hex_rev;
 use crate::script::classify_script;
-use crate::tx::{ParsedTx, TxInput, TxOutput};
+use crate::tx::ParsedTx;
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 use std::collections::HashMap;
@@ -29,44 +29,27 @@ pub struct PrevoutEntry {
     pub scriptpubkey: String, // hex-encoded
 }
 
+// Prevout-enriched facts about a transaction, computed once and shared across detectors.
+// `tx` never carries this data itself — it is looked up from prevouts fetched separately.
+// spendable_out_count/weight are unread until Step 1.5 moves more detectors onto TxContext.
+#[allow(dead_code)]
+pub struct TxContext<'a> {
+    pub tx: &'a ParsedTx,
+    pub input_values: Vec<u64>,
+    pub input_scripts: Vec<Vec<u8>>,
+    pub is_coinbase: bool,
+    pub spendable_out_count: usize,
+    pub fee: u64,
+    pub weight: u64,
+    pub vbytes: u64,
+}
+
 pub fn analyze_single_tx(tx: &ParsedTx, prevouts: &[PrevoutEntry]) -> Value {
-    // Populate input_values and input_scripts from prevout data.
     let input_values: Vec<u64> = prevouts.iter().map(|p| p.value).collect();
     let input_scripts: Vec<Vec<u8>> = prevouts
         .iter()
         .map(|p| hex::decode(&p.scriptpubkey).unwrap_or_default())
         .collect();
-
-    // Build an enriched ParsedTx with the prevout data filled in.
-    let tx_with_values = ParsedTx {
-        version: tx.version,
-        locktime: tx.locktime,
-        is_segwit: tx.is_segwit,
-        inputs: tx
-            .inputs
-            .iter()
-            .map(|i| TxInput {
-                txid_bytes: i.txid_bytes,
-                vout: i.vout,
-                script_sig: i.script_sig.clone(),
-                sequence: i.sequence,
-                witness: i.witness.clone(),
-            })
-            .collect(),
-        outputs: tx
-            .outputs
-            .iter()
-            .map(|o| TxOutput {
-                value: o.value,
-                script_pubkey: o.script_pubkey.clone(),
-            })
-            .collect(),
-        txid: tx.txid,
-        base_size: tx.base_size,
-        witness_size: tx.witness_size,
-        input_values: input_values.clone(),
-        input_scripts: input_scripts.clone(),
-    };
 
     let is_coinbase = tx.inputs.len() == 1
         && tx.inputs[0].txid_bytes == [0u8; 32]
@@ -88,7 +71,18 @@ pub fn analyze_single_tx(tx: &ParsedTx, prevouts: &[PrevoutEntry]) -> Value {
         0u64
     };
 
-    let change_result = detect_change(&tx_with_values, is_coinbase, fee, vbytes);
+    let ctx = TxContext {
+        tx,
+        input_values,
+        input_scripts,
+        is_coinbase,
+        spendable_out_count,
+        fee,
+        weight,
+        vbytes,
+    };
+
+    let change_result = detect_change(&ctx);
 
     // Build script_counts from: output scripts + input prevout scripts (for intra-tx reuse).
     let mut script_counts: HashMap<Vec<u8>, usize> = HashMap::new();
@@ -97,13 +91,13 @@ pub fn analyze_single_tx(tx: &ParsedTx, prevouts: &[PrevoutEntry]) -> Value {
             *script_counts.entry(out.script_pubkey.clone()).or_insert(0) += 1;
         }
     }
-    for script in &input_scripts {
+    for script in &ctx.input_scripts {
         if !script.is_empty() {
             *script_counts.entry(script.clone()).or_insert(0) += 1;
         }
     }
 
-    let input_script_set: std::collections::HashSet<&Vec<u8>> = input_scripts.iter().collect();
+    let input_script_set: std::collections::HashSet<&Vec<u8>> = ctx.input_scripts.iter().collect();
 
     let reuse_detected = !is_coinbase
         && tx.outputs.iter().any(|o| {
@@ -144,7 +138,7 @@ pub fn analyze_single_tx(tx: &ParsedTx, prevouts: &[PrevoutEntry]) -> Value {
         (coinjoin_result, coinjoin_detected)
     };
 
-    let unnecessary_input_result = detect_unnecessary_inputs(&tx_with_values, is_coinbase);
+    let unnecessary_input_result = detect_unnecessary_inputs(&ctx);
 
     let script_upgrade_result = detect_script_type_upgrade(tx, is_coinbase);
 
@@ -197,8 +191,8 @@ pub fn analyze_single_tx(tx: &ParsedTx, prevouts: &[PrevoutEntry]) -> Value {
         .enumerate()
         .map(|(i, inp)| {
             let script_type = infer_input_script_type(inp);
-            let value_sats = input_values.get(i).copied().unwrap_or(0);
-            let prevout_script = input_scripts.get(i).cloned().unwrap_or_default();
+            let value_sats = ctx.input_values.get(i).copied().unwrap_or(0);
+            let prevout_script = ctx.input_scripts.get(i).cloned().unwrap_or_default();
             let address = address_from_script(&prevout_script).unwrap_or_default();
             json!({
                 "index": i,
