@@ -1,12 +1,12 @@
 // Analysis primitives shared across heuristic detectors.
 
-use crate::script::classify_script;
+use crate::script::{classify_script, ScriptType};
 use crate::tx::{ParsedTx, TxOutput};
 use serde_json::{json, Value};
 
 // An output counts as spendable unless it is OP_RETURN (data-carrying, unspendable by consensus).
 pub fn is_spendable(output: &TxOutput) -> bool {
-    classify_script(&output.script_pubkey) != "op_return"
+    classify_script(&output.script_pubkey) != ScriptType::OpReturn
 }
 
 // Values of all spendable outputs, in output order.

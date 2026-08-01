@@ -5,7 +5,7 @@
 
 use crate::address::address_from_script;
 use crate::crypto::hex_rev;
-use crate::script::classify_script;
+use crate::script::{classify_script, ScriptType};
 use crate::tx::ParsedTx;
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Map, Value};
@@ -127,7 +127,7 @@ pub fn run_heuristics(ctx: &TxContext) -> HeuristicResults {
         ctx.spendable_out_count,
     );
 
-    let input_script_types: Vec<&str> = ctx
+    let input_script_types: Vec<ScriptType> = ctx
         .tx
         .inputs
         .iter()

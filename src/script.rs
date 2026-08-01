@@ -1,6 +1,47 @@
 // Script classification, disassembly, and OP_RETURN parsing.
 
-pub fn classify_script(script: &[u8]) -> &'static str {
+use serde::{Serialize, Serializer};
+
+// A script's shape, covering both output scriptPubKeys (classify_script) and inferred
+// input spend types (classification::infer_input_script_type) — the two domains share
+// p2pkh/p2wpkh/p2wsh/p2tr/unknown, and each also has members the other never produces.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum ScriptType {
+    P2pkh,
+    P2sh,
+    P2wpkh,
+    P2wsh,
+    P2tr,
+    P2shP2wpkh,
+    P2shP2wsh,
+    OpReturn,
+    Unknown,
+}
+
+impl ScriptType {
+    // The wire-format string — this is the JSON API contract, must not change.
+    pub fn as_str(self) -> &'static str {
+        match self {
+            ScriptType::P2pkh => "p2pkh",
+            ScriptType::P2sh => "p2sh",
+            ScriptType::P2wpkh => "p2wpkh",
+            ScriptType::P2wsh => "p2wsh",
+            ScriptType::P2tr => "p2tr",
+            ScriptType::P2shP2wpkh => "p2sh-p2wpkh",
+            ScriptType::P2shP2wsh => "p2sh-p2wsh",
+            ScriptType::OpReturn => "op_return",
+            ScriptType::Unknown => "unknown",
+        }
+    }
+}
+
+impl Serialize for ScriptType {
+    fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+pub fn classify_script(script: &[u8]) -> ScriptType {
     let len = script.len();
     if len == 25
         && script[0] == 0x76  // OP_DUP
@@ -10,7 +51,7 @@ pub fn classify_script(script: &[u8]) -> &'static str {
         && script[24] == 0xac
     // OP_CHECKSIG
     {
-        return "p2pkh";
+        return ScriptType::P2pkh;
     }
     if len == 23
         && script[0] == 0xa9  // OP_HASH160
@@ -18,25 +59,25 @@ pub fn classify_script(script: &[u8]) -> &'static str {
         && script[22] == 0x87
     // OP_EQUAL
     {
-        return "p2sh";
+        return ScriptType::P2sh;
     }
     if len == 22 && script[0] == 0x00 && script[1] == 0x14 {
         // OP_0 + 20-byte push
-        return "p2wpkh";
+        return ScriptType::P2wpkh;
     }
     if len == 34 && script[0] == 0x00 && script[1] == 0x20 {
         // OP_0 + 32-byte push
-        return "p2wsh";
+        return ScriptType::P2wsh;
     }
     if len == 34 && script[0] == 0x51 && script[1] == 0x20 {
         // OP_1 + 32-byte push (Taproot, BIP340/341)
-        return "p2tr";
+        return ScriptType::P2tr;
     }
     if !script.is_empty() && script[0] == 0x6a {
         // OP_RETURN — output is unspendable; payload may carry protocol data
-        return "op_return";
+        return ScriptType::OpReturn;
     }
-    "unknown"
+    ScriptType::Unknown
 }
 
 // Decode the push operation at `script[i]` (a PUSHBYTES/PUSHDATA1/PUSHDATA2/PUSHDATA4
@@ -133,7 +174,7 @@ mod tests {
         let mut s = vec![0x76, 0xa9, 0x14];
         s.extend_from_slice(&[0u8; 20]);
         s.extend_from_slice(&[0x88, 0xac]);
-        assert_eq!(classify_script(&s), "p2pkh");
+        assert_eq!(classify_script(&s), ScriptType::P2pkh);
     }
 
     #[test]
@@ -141,40 +182,53 @@ mod tests {
         let mut s = vec![0xa9, 0x14];
         s.extend_from_slice(&[0u8; 20]);
         s.push(0x87);
-        assert_eq!(classify_script(&s), "p2sh");
+        assert_eq!(classify_script(&s), ScriptType::P2sh);
     }
 
     #[test]
     fn classify_script_p2wpkh() {
         let mut s = vec![0x00, 0x14];
         s.extend_from_slice(&[0u8; 20]);
-        assert_eq!(classify_script(&s), "p2wpkh");
+        assert_eq!(classify_script(&s), ScriptType::P2wpkh);
     }
 
     #[test]
     fn classify_script_p2wsh() {
         let mut s = vec![0x00, 0x20];
         s.extend_from_slice(&[0u8; 32]);
-        assert_eq!(classify_script(&s), "p2wsh");
+        assert_eq!(classify_script(&s), ScriptType::P2wsh);
     }
 
     #[test]
     fn classify_script_p2tr() {
         let mut s = vec![0x51, 0x20];
         s.extend_from_slice(&[0u8; 32]);
-        assert_eq!(classify_script(&s), "p2tr");
+        assert_eq!(classify_script(&s), ScriptType::P2tr);
     }
 
     #[test]
     fn classify_script_op_return() {
-        assert_eq!(classify_script(&[0x6a]), "op_return");
-        assert_eq!(classify_script(&[0x6a, 0x00]), "op_return");
+        assert_eq!(classify_script(&[0x6a]), ScriptType::OpReturn);
+        assert_eq!(classify_script(&[0x6a, 0x00]), ScriptType::OpReturn);
     }
 
     #[test]
     fn classify_script_unknown() {
-        assert_eq!(classify_script(&[]), "unknown");
-        assert_eq!(classify_script(&[0x51, 0x02, 0xab, 0xcd]), "unknown");
+        assert_eq!(classify_script(&[]), ScriptType::Unknown);
+        assert_eq!(classify_script(&[0x51, 0x02, 0xab, 0xcd]), ScriptType::Unknown);
+    }
+
+    #[test]
+    fn script_type_as_str_matches_wire_format() {
+        assert_eq!(ScriptType::P2pkh.as_str(), "p2pkh");
+        assert_eq!(ScriptType::P2sh.as_str(), "p2sh");
+        assert_eq!(ScriptType::P2wpkh.as_str(), "p2wpkh");
+        assert_eq!(ScriptType::P2wsh.as_str(), "p2wsh");
+        assert_eq!(ScriptType::P2tr.as_str(), "p2tr");
+        assert_eq!(ScriptType::P2shP2wpkh.as_str(), "p2sh-p2wpkh");
+        assert_eq!(ScriptType::P2shP2wsh.as_str(), "p2sh-p2wsh");
+        assert_eq!(ScriptType::OpReturn.as_str(), "op_return");
+        assert_eq!(ScriptType::Unknown.as_str(), "unknown");
     }
 
     #[test]

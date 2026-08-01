@@ -1,5 +1,6 @@
 // Transaction classification and script type inference
 
+use crate::script::ScriptType;
 use crate::tx::{ParsedTx, TxInput};
 use serde_json::Value;
 use std::collections::HashMap;
@@ -7,7 +8,7 @@ use std::collections::HashMap;
 use super::common::signals_rbf;
 
 // Infer the script type an input is spending from witness/scriptSig structure alone.
-pub fn infer_input_script_type(input: &TxInput) -> &'static str {
+pub fn infer_input_script_type(input: &TxInput) -> ScriptType {
     let has_witness = !input.witness.is_empty();
     let has_scriptsig = !input.script_sig.is_empty();
 
@@ -15,29 +16,29 @@ pub fn infer_input_script_type(input: &TxInput) -> &'static str {
         // Native segwit or taproot
         let items = &input.witness;
         if items.len() == 1 && (items[0].len() == 64 || items[0].len() == 65) {
-            return "p2tr"; // Taproot keypath: single schnorr signature
+            return ScriptType::P2tr; // Taproot keypath: single schnorr signature
         }
         if items.len() == 2 && items[1].len() == 33 {
-            return "p2wpkh"; // DER sig + compressed pubkey
+            return ScriptType::P2wpkh; // DER sig + compressed pubkey
         }
-        return "p2wsh";
+        return ScriptType::P2wsh;
     }
     if has_witness && has_scriptsig {
         // P2SH-wrapped segwit: scriptSig carries the redeem script, witness carries the spend.
         if input.witness.len() == 2 && input.witness[1].len() == 33 {
-            return "p2sh-p2wpkh";
+            return ScriptType::P2shP2wpkh;
         }
-        return "p2sh-p2wsh";
+        return ScriptType::P2shP2wsh;
     }
     if has_scriptsig {
-        return "p2pkh";
+        return ScriptType::P2pkh;
     }
-    "unknown"
+    ScriptType::Unknown
 }
 
 // Return the script type that appears most often across all inputs.
-pub fn dominant_input_type(tx: &ParsedTx) -> &'static str {
-    let mut counts: HashMap<&'static str, usize> = HashMap::new();
+pub fn dominant_input_type(tx: &ParsedTx) -> ScriptType {
+    let mut counts: HashMap<ScriptType, usize> = HashMap::new();
     for inp in &tx.inputs {
         let t = infer_input_script_type(inp);
         *counts.entry(t).or_insert(0) += 1;
@@ -46,7 +47,7 @@ pub fn dominant_input_type(tx: &ParsedTx) -> &'static str {
         .into_iter()
         .max_by_key(|(_, c)| *c)
         .map(|(t, _)| t)
-        .unwrap_or("unknown")
+        .unwrap_or(ScriptType::Unknown)
 }
 
 // True when the outputs are sorted by (value ASC, scriptPubKey ASC) per BIP69.

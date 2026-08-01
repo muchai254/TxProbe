@@ -1,6 +1,6 @@
 // Batch payment detection heuristic
 
-use crate::script::classify_script;
+use crate::script::{classify_script, ScriptType};
 use serde_json::{json, Value};
 
 use super::analysis::TxContext;
@@ -13,8 +13,7 @@ pub fn detect(ctx: &TxContext) -> Value {
         return not_detected();
     }
 
-    let mut type_set: std::collections::HashSet<&'static str> =
-        std::collections::HashSet::new();
+    let mut type_set: std::collections::HashSet<ScriptType> = std::collections::HashSet::new();
     for out in &ctx.tx.outputs {
         if is_spendable(out) {
             type_set.insert(classify_script(&out.script_pubkey));

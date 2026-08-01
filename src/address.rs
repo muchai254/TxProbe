@@ -1,6 +1,7 @@
 // Address derivation for all standard Bitcoin output script types.
 
 use crate::crypto::dsha256;
+use crate::script::{classify_script, ScriptType};
 
 // Encode a hash payload into a Base58Check address.
 
@@ -95,37 +96,22 @@ pub fn bech32_encode_addr(hrp: &str, witness_version: u8, program: &[u8]) -> Str
 
 // Derive a mainnet address from an output script, returning None for
 // non-standard or OP_RETURN scripts that have no spendable address.
+//
+// classify_script has already validated each type's length and byte layout, so the
+// payload for a given ScriptType always sits at the same fixed offset — adding a new
+// script type only means adding a case here, not re-deriving the layout check.
 pub fn address_from_script(script: &[u8]) -> Option<String> {
-    let len = script.len();
-
-    // P2PKH: extract the 20-byte public key hash at bytes 3-22.
-    if len == 25
-        && script[0] == 0x76
-        && script[1] == 0xa9
-        && script[2] == 0x14
-        && script[23] == 0x88
-        && script[24] == 0xac
-    {
-        return Some(base58check_encode(0x00, &script[3..23]));
+    match classify_script(script) {
+        // P2PKH: 20-byte public key hash at bytes 3-22.
+        ScriptType::P2pkh => Some(base58check_encode(0x00, &script[3..23])),
+        // P2SH: 20-byte script hash at bytes 2-21.
+        ScriptType::P2sh => Some(base58check_encode(0x05, &script[2..22])),
+        // P2WPKH/P2WSH: witness program starts at byte 2 (witness version 0).
+        ScriptType::P2wpkh | ScriptType::P2wsh => Some(bech32_encode_addr("bc", 0, &script[2..])),
+        // P2TR: 32-byte x-only pubkey starts at byte 2 (witness version 1, Bech32m).
+        ScriptType::P2tr => Some(bech32_encode_addr("bc", 1, &script[2..])),
+        _ => None,
     }
-
-    if len == 23 && script[0] == 0xa9 && script[1] == 0x14 && script[22] == 0x87 {
-        return Some(base58check_encode(0x05, &script[2..22]));
-    }
-
-    if len == 22 && script[0] == 0x00 && script[1] == 0x14 {
-        return Some(bech32_encode_addr("bc", 0, &script[2..]));
-    }
-
-    if len == 34 && script[0] == 0x00 && script[1] == 0x20 {
-        return Some(bech32_encode_addr("bc", 0, &script[2..]));
-    }
-
-    if len == 34 && script[0] == 0x51 && script[1] == 0x20 {
-        return Some(bech32_encode_addr("bc", 1, &script[2..]));
-    }
-
-    None
 }
 
 #[cfg(test)]

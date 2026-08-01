@@ -1,6 +1,6 @@
 // Change detection heuristic
 
-use crate::script::classify_script;
+use crate::script::{classify_script, ScriptType};
 use crate::varint::compact_size_len;
 use serde_json::{json, Value};
 
@@ -49,7 +49,7 @@ pub fn detect(ctx: &TxContext) -> Value {
         let mut signals: Vec<&'static str> = vec![];
 
         let cand_type = classify_script(&cand_out.script_pubkey);
-        if dominant_type != "unknown" && cand_type == dominant_type {
+        if dominant_type != ScriptType::Unknown && cand_type == dominant_type {
             score += 0.35;
             signals.push("script_type_matches_inputs");
         }
@@ -86,8 +86,8 @@ pub fn detect(ctx: &TxContext) -> Value {
             let marginal_cost = fee_rate * out_vbytes as f64;
 
             let dust = match cand_type {
-                "p2wpkh" | "p2tr" => DUST_FLOOR_P2WPKH_P2TR_SATS,
-                "p2wsh" => DUST_FLOOR_P2WSH_SATS,
+                ScriptType::P2wpkh | ScriptType::P2tr => DUST_FLOOR_P2WPKH_P2TR_SATS,
+                ScriptType::P2wsh => DUST_FLOOR_P2WSH_SATS,
                 _ => DUST_FLOOR_LEGACY_SATS,
             };
             let floor = dust.max(marginal_cost.ceil() as u64);
