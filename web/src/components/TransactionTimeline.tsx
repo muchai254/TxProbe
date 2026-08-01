@@ -1,13 +1,6 @@
 import { ChevronRight } from 'lucide-react'
 import type { TxSummary, HeuristicId } from '../lib/types'
-
-const HEURISTIC_CHIPS: Record<string, string> = {
-  cioh: 'CIOH', change_detection: 'CHNG', address_reuse: 'REUSE',
-  coinjoin: 'JOIN', consolidation: 'CONS', self_transfer: 'SELF',
-  peeling_chain: 'PEEL', op_return: 'OPRT', round_number_payment: 'RNPMT',
-  locktime_analysis: 'LOCK', inscription: 'INSC', unnecessary_input: 'UNIN',
-  script_type_upgrade: 'SCUP', batch_payment: 'BATP',
-}
+import { getHeuristic, HEURISTIC_IDS } from '../lib/heuristics'
 
 interface TransactionTimelineProps {
   transactions: TxSummary[];
@@ -17,13 +10,6 @@ interface TransactionTimelineProps {
   visibleCount: number;
   onLoadMore: () => void;
 }
-
-const ALL_HEURISTICS: HeuristicId[] = [
-  'cioh', 'change_detection', 'address_reuse', 'coinjoin',
-  'consolidation', 'self_transfer', 'peeling_chain', 'op_return',
-  'round_number_payment', 'locktime_analysis', 'inscription',
-  'unnecessary_input', 'script_type_upgrade', 'batch_payment',
-]
 
 export default function TransactionTimeline({
   transactions,
@@ -36,7 +22,7 @@ export default function TransactionTimeline({
   const visible = transactions.slice(0, visibleCount)
   const hasMore = transactions.length > visibleCount
 
-  const activeChips = ALL_HEURISTICS.filter(id =>
+  const activeChips = HEURISTIC_IDS.filter(id =>
     transactions.some(tx => tx.detected_heuristics.includes(id))
   )
 
@@ -67,7 +53,7 @@ export default function TransactionTimeline({
               transition: 'all var(--duration-fast)',
             }}
           >
-            {HEURISTIC_CHIPS[id] || id.toUpperCase()}
+            {getHeuristic(id).chip}
           </button>
         ))}
       </div>
@@ -140,7 +126,7 @@ export default function TransactionTimeline({
                     fontWeight: 700,
                     backgroundColor: 'var(--color-signal-low)',
                   }}>
-                    {HEURISTIC_CHIPS[h] || h.slice(0, 4).toUpperCase()}
+                    {getHeuristic(h).chip}
                   </span>
                 ))}
                 {tx.detected_heuristics.length === 0 && (

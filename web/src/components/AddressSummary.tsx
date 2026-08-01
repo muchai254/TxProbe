@@ -1,14 +1,7 @@
 import PrivacyScoreRing from './PrivacyScoreRing'
 import { ArrowUpRight } from 'lucide-react'
 import type { AddressStats } from '../lib/types'
-
-const HEURISTIC_CHIPS: Record<string, string> = {
-  cioh: 'CIOH', change_detection: 'CHNG', address_reuse: 'REUSE',
-  coinjoin: 'JOIN', consolidation: 'CONS', self_transfer: 'SELF',
-  peeling_chain: 'PEEL', op_return: 'OPRT', round_number_payment: 'RNPMT',
-  locktime_analysis: 'LOCK', inscription: 'INSC', unnecessary_input: 'UNIN',
-  script_type_upgrade: 'SCUP', batch_payment: 'BATP',
-}
+import { getHeuristic } from '../lib/heuristics'
 
 interface AddressSummaryProps {
   address: string;
@@ -17,7 +10,7 @@ interface AddressSummaryProps {
 }
 
 export default function AddressSummary({ address, stats, onWorstLeakClick }: AddressSummaryProps) {
-  const chipLabel = HEURISTIC_CHIPS[stats.most_frequent_heuristic] || stats.most_frequent_heuristic?.toUpperCase()
+  const chipLabel = getHeuristic(stats.most_frequent_heuristic).chip
   const worstTxShort = stats.worst_tx
     ? `${stats.worst_tx.slice(0, 8)}...${stats.worst_tx.slice(-6)}`
     : null

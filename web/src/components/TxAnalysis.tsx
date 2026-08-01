@@ -1,7 +1,7 @@
 import { useEffect, useReducer } from 'react'
 import { analyzeTx } from '../lib/api'
 import type { TxAnalysis as TxAnalysisData, HeuristicId, NavSource } from '../lib/types'
-import { HEURISTICS } from '../lib/heuristics'
+import { HEURISTIC_IDS } from '../lib/heuristics'
 import Header from './Header'
 import TxGraph from './TxGraph'
 import FindingsPanel from './FindingsPanel'
@@ -84,7 +84,7 @@ export default function TxAnalysis({ txid, source, onBack }: Props) {
 
   const data = state.status === 'success' ? state.data : null
   const detectedHeuristics: HeuristicId[] = data
-    ? (HEURISTICS.map(h => h.id).filter(id => data.heuristics[id]?.detected) as HeuristicId[])
+    ? HEURISTIC_IDS.filter(id => data.heuristics[id]?.detected)
     : []
 
   return (

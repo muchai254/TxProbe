@@ -1,12 +1,5 @@
 import { useEffect, useState } from 'react'
-import type { HeuristicId } from '../lib/types'
-
-const HEURISTIC_IDS: HeuristicId[] = [
-  'cioh', 'change_detection', 'address_reuse', 'coinjoin',
-  'consolidation', 'self_transfer', 'peeling_chain', 'op_return',
-  'round_number_payment', 'locktime_analysis', 'inscription',
-  'unnecessary_input', 'script_type_upgrade', 'batch_payment',
-]
+import { HEURISTIC_IDS } from '../lib/heuristics'
 
 interface TxLoadingProps {
   phase: 'fetching' | 'analyzing';

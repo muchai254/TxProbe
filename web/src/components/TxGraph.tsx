@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import type { TxInput, TxOutput, HeuristicId, HeuristicResult } from '../lib/types'
+import { getHeuristic } from '../lib/heuristics'
 
 interface TxGraphProps {
   inputs: TxInput[];
@@ -19,14 +20,6 @@ const MAX_NODES = 8;
 function formatSats(sats: number): string {
   if (sats >= 100_000_000) return `${(sats / 100_000_000).toFixed(4)} BTC`
   return `${sats.toLocaleString()} sat`
-}
-
-const CHIP_MAP: Record<string, string> = {
-  cioh: 'CIOH', change_detection: 'CHNG', address_reuse: 'REUSE',
-  coinjoin: 'JOIN', consolidation: 'CONS', self_transfer: 'SELF',
-  peeling_chain: 'PEEL', op_return: 'OPRT', round_number_payment: 'RNPMT',
-  locktime_analysis: 'LOCK', inscription: 'INSC', unnecessary_input: 'UNIN',
-  script_type_upgrade: 'SCUP', batch_payment: 'BATP',
 }
 
 export default function TxGraph({
@@ -99,7 +92,7 @@ export default function TxGraph({
     )
   }
 
-  const chipLabels = detectedHeuristics.slice(0, 5).map(h => CHIP_MAP[h] || h.slice(0, 5).toUpperCase())
+  const chipLabels = detectedHeuristics.slice(0, 5).map(h => getHeuristic(h).chip)
   const chipTotalW = chipLabels.length * 38 - 2
 
   return (

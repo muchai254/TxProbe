@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import type { HeuristicId, HeuristicResult } from '../lib/types'
-import { HEURISTICS } from '../lib/heuristics'
+import { HEURISTIC_LIST } from '../lib/heuristics'
 import HeuristicRow from './HeuristicRow'
 import PrivacyScoreRing, { getScoreLabel } from './PrivacyScoreRing'
 
@@ -13,7 +13,7 @@ interface FindingsPanelProps {
 export default function FindingsPanel({ score, heuristics, detectedCount }: FindingsPanelProps) {
   const [expanded, setExpanded] = useState<HeuristicId | null>(null)
 
-  const severityCounts = HEURISTICS.reduce<{ high: number; medium: number; low: number }>(
+  const severityCounts = HEURISTIC_LIST.reduce<{ high: number; medium: number; low: number }>(
     (acc, h) => {
       const r = heuristics[h.id]
       if (r?.detected) {
@@ -85,7 +85,7 @@ export default function FindingsPanel({ score, heuristics, detectedCount }: Find
         Severity reflects how much an observer learns from each flagged pattern.
       </div>
 
-      {HEURISTICS.map(h => (
+      {HEURISTIC_LIST.map(h => (
         <HeuristicRow
           key={h.id}
           id={h.id}
