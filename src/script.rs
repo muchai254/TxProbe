@@ -39,6 +39,40 @@ pub fn classify_script(script: &[u8]) -> &'static str {
     "unknown"
 }
 
+// Decode the push operation at `script[i]` (a PUSHBYTES/PUSHDATA1/PUSHDATA2/PUSHDATA4
+// opcode), returning its data and the index just past it. `None` if `script[i]` is not
+// one of those opcodes, or if the push's length would run past the end of `script`.
+pub fn read_push(script: &[u8], i: usize) -> Option<(&[u8], usize)> {
+    let op = *script.get(i)?;
+    let (start, n) = match op {
+        0x01..=0x4b => (i + 1, op as usize),
+        0x4c => (i + 2, *script.get(i + 1)? as usize),
+        0x4d => {
+            if i + 3 > script.len() {
+                return None;
+            }
+            (i + 3, u16::from_le_bytes([script[i + 1], script[i + 2]]) as usize)
+        }
+        0x4e => {
+            if i + 5 > script.len() {
+                return None;
+            }
+            let n = u32::from_le_bytes([
+                script[i + 1],
+                script[i + 2],
+                script[i + 3],
+                script[i + 4],
+            ]) as usize;
+            (i + 5, n)
+        }
+        _ => return None,
+    };
+    if start + n > script.len() {
+        return None;
+    }
+    Some((&script[start..start + n], start + n))
+}
+
 // Concatenate all push-data payloads following the OP_RETURN opcode.
 pub fn extract_op_return_payload(script: &[u8]) -> Vec<u8> {
     if script.is_empty() || script[0] != 0x6a {
@@ -47,61 +81,17 @@ pub fn extract_op_return_payload(script: &[u8]) -> Vec<u8> {
     let mut data = Vec::new();
     let mut i = 1;
     while i < script.len() {
-        let op = script[i];
-        i += 1;
-        match op {
-            0x00 => {}
-            0x01..=0x4b => {
-                let n = op as usize;
-                if i + n <= script.len() {
-                    data.extend_from_slice(&script[i..i + n]);
-                    i += n;
-                } else {
-                    break;
+        match script[i] {
+            0x01..=0x4e => match read_push(script, i) {
+                Some((chunk, next_i)) => {
+                    data.extend_from_slice(chunk);
+                    i = next_i;
                 }
-            }
-            0x4c => {
-                if i < script.len() {
-                    let n = script[i] as usize;
-                    i += 1;
-                    if i + n <= script.len() {
-                        data.extend_from_slice(&script[i..i + n]);
-                        i += n;
-                    } else {
-                        break;
-                    }
-                }
-            }
-            0x4d => {
-                if i + 2 <= script.len() {
-                    let n = u16::from_le_bytes([script[i], script[i + 1]]) as usize;
-                    i += 2;
-                    if i + n <= script.len() {
-                        data.extend_from_slice(&script[i..i + n]);
-                        i += n;
-                    } else {
-                        break;
-                    }
-                }
-            }
-            0x4e => {
-                if i + 4 <= script.len() {
-                    let n = u32::from_le_bytes([
-                        script[i],
-                        script[i + 1],
-                        script[i + 2],
-                        script[i + 3],
-                    ]) as usize;
-                    i += 4;
-                    if i + n <= script.len() {
-                        data.extend_from_slice(&script[i..i + n]);
-                        i += n;
-                    } else {
-                        break;
-                    }
-                }
-            }
-            _ => {}
+                // Truncated push: nothing more can be recovered from the rest of the script.
+                None => break,
+            },
+            // OP_0 and any opcode without an operand: not a push, skip and keep scanning.
+            _ => i += 1,
         }
     }
     data

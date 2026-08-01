@@ -2,27 +2,43 @@
 
 use std::io::{self, Read};
 
-pub fn read_compact_size<R: Read>(r: &mut R) -> io::Result<u64> {
+fn read_compact_size_impl<R: Read>(r: &mut R, mut out: Option<&mut Vec<u8>>) -> io::Result<u64> {
     let mut b = [0u8; 1];
     r.read_exact(&mut b)?;
+    if let Some(o) = out.as_mut() {
+        o.push(b[0]);
+    }
     match b[0] {
         0xfd => {
             let mut buf = [0u8; 2];
             r.read_exact(&mut buf)?;
+            if let Some(o) = out.as_mut() {
+                o.extend_from_slice(&buf);
+            }
             Ok(u16::from_le_bytes(buf) as u64)
         }
         0xfe => {
             let mut buf = [0u8; 4];
             r.read_exact(&mut buf)?;
+            if let Some(o) = out.as_mut() {
+                o.extend_from_slice(&buf);
+            }
             Ok(u32::from_le_bytes(buf) as u64)
         }
         0xff => {
             let mut buf = [0u8; 8];
             r.read_exact(&mut buf)?;
+            if let Some(o) = out.as_mut() {
+                o.extend_from_slice(&buf);
+            }
             Ok(u64::from_le_bytes(buf))
         }
         x => Ok(x as u64),
     }
+}
+
+pub fn read_compact_size<R: Read>(r: &mut R) -> io::Result<u64> {
+    read_compact_size_impl(r, None)
 }
 
 // Returns the byte width a CompactSize encoding of `n` would occupy.
@@ -39,31 +55,10 @@ pub fn compact_size_len(n: u64) -> usize {
     }
 }
 
+// Same encoding as read_compact_size, but also mirrors the consumed bytes into `out` —
+// tx.rs uses this to rebuild the legacy serialization needed for txid computation.
 pub fn read_compact_size_vec<R: Read>(r: &mut R, out: &mut Vec<u8>) -> io::Result<u64> {
-    let mut b = [0u8; 1];
-    r.read_exact(&mut b)?;
-    out.push(b[0]);
-    match b[0] {
-        0xfd => {
-            let mut buf = [0u8; 2];
-            r.read_exact(&mut buf)?;
-            out.extend_from_slice(&buf);
-            Ok(u16::from_le_bytes(buf) as u64)
-        }
-        0xfe => {
-            let mut buf = [0u8; 4];
-            r.read_exact(&mut buf)?;
-            out.extend_from_slice(&buf);
-            Ok(u32::from_le_bytes(buf) as u64)
-        }
-        0xff => {
-            let mut buf = [0u8; 8];
-            r.read_exact(&mut buf)?;
-            out.extend_from_slice(&buf);
-            Ok(u64::from_le_bytes(buf))
-        }
-        x => Ok(x as u64),
-    }
+    read_compact_size_impl(r, Some(out))
 }
 
 #[cfg(test)]
