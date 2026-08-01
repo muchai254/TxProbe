@@ -1,6 +1,7 @@
-// Single-transaction analysis entry point for txprobe-analyzer.
-// Unlike Sherlock's shared.rs which operates on full blocks, this module
-// accepts a single ParsedTx plus prevout data fetched from mempool.space.
+// Single-transaction analysis orchestrator for txprobe-analyzer.
+// Unlike Sherlock's shared.rs (the ancestor block-scanning project's module this
+// one is named after), this module accepts a single ParsedTx plus prevout data
+// fetched from mempool.space.
 
 use crate::address::address_from_script;
 use crate::crypto::hex_rev;
@@ -14,7 +15,7 @@ use super::batch_payment::detect_batch_payment;
 use super::change_detection::detect_change;
 use super::classification::{classify_tx, compute_privacy_score, infer_input_script_type};
 use super::coinjoin::detect_coinjoin;
-use super::common::{is_spendable, not_detected, signals_rbf, COINBASE_VOUT};
+use super::common::{detected, is_spendable, not_detected, signals_rbf, COINBASE_VOUT};
 use super::inscription::detect_witness_inscription;
 use super::locktime::detect_locktime_analysis;
 use super::op_return::detect_op_return;
@@ -31,8 +32,6 @@ pub struct PrevoutEntry {
 
 // Prevout-enriched facts about a transaction, computed once and shared across detectors.
 // `tx` never carries this data itself — it is looked up from prevouts fetched separately.
-// spendable_out_count/weight are unread until Step 1.5 moves more detectors onto TxContext.
-#[allow(dead_code)]
 pub struct TxContext<'a> {
     pub tx: &'a ParsedTx,
     pub input_values: Vec<u64>,
@@ -44,45 +43,74 @@ pub struct TxContext<'a> {
     pub vbytes: u64,
 }
 
-pub fn analyze_single_tx(tx: &ParsedTx, prevouts: &[PrevoutEntry]) -> Value {
-    let input_values: Vec<u64> = prevouts.iter().map(|p| p.value).collect();
-    let input_scripts: Vec<Vec<u8>> = prevouts
-        .iter()
-        .map(|p| hex::decode(&p.scriptpubkey).unwrap_or_default())
-        .collect();
+impl<'a> TxContext<'a> {
+    pub fn new(tx: &'a ParsedTx, prevouts: &[PrevoutEntry]) -> Self {
+        let input_values: Vec<u64> = prevouts.iter().map(|p| p.value).collect();
+        let input_scripts: Vec<Vec<u8>> = prevouts
+            .iter()
+            .map(|p| hex::decode(&p.scriptpubkey).unwrap_or_default())
+            .collect();
 
-    let is_coinbase = tx.inputs.len() == 1
-        && tx.inputs[0].txid_bytes == [0u8; 32]
-        && tx.inputs[0].vout == COINBASE_VOUT;
+        let is_coinbase = tx.inputs.len() == 1
+            && tx.inputs[0].txid_bytes == [0u8; 32]
+            && tx.inputs[0].vout == COINBASE_VOUT;
 
-    let spendable_out_count = tx.outputs.iter().filter(|o| is_spendable(o)).count();
+        let spendable_out_count = tx.outputs.iter().filter(|o| is_spendable(o)).count();
+
+        let weight = (tx.base_size as u64) * 4 + (tx.witness_size as u64);
+        let vbytes = (weight + 3) / 4;
+
+        // Fee = sum(prevout values) - sum(output values)
+        let total_in: u64 = input_values.iter().sum();
+        let total_out: u64 = tx.outputs.iter().map(|o| o.value).sum();
+        let fee = if !is_coinbase && total_in >= total_out {
+            total_in - total_out
+        } else {
+            0u64
+        };
+
+        TxContext {
+            tx,
+            input_values,
+            input_scripts,
+            is_coinbase,
+            spendable_out_count,
+            fee,
+            weight,
+            vbytes,
+        }
+    }
+}
+
+// Detection results for every heuristic, plus the classification and privacy score
+// derived from them.
+pub struct HeuristicResults {
+    pub cioh_detected: bool,
+    pub change_result: Value,
+    pub reuse_detected: bool,
+    pub coinjoin_result: Value,
+    pub consolidation_detected: bool,
+    pub self_transfer_detected: bool,
+    pub peeling_chain_detected: bool,
+    pub op_return_result: Value,
+    pub round_payment_result: Value,
+    pub locktime_result: Value,
+    pub inscription_result: Value,
+    pub unnecessary_input_result: Value,
+    pub script_upgrade_result: Value,
+    pub batch_payment_result: Value,
+    pub classification: &'static str,
+    pub privacy_score: Option<u8>,
+}
+
+pub fn run_heuristics(ctx: &TxContext) -> HeuristicResults {
+    let tx = ctx.tx;
+    let is_coinbase = ctx.is_coinbase;
+    let spendable_out_count = ctx.spendable_out_count;
 
     let cioh_detected = !is_coinbase && tx.inputs.len() > 1;
 
-    let weight = (tx.base_size as u64) * 4 + (tx.witness_size as u64);
-    let vbytes = (weight + 3) / 4;
-
-    // Fee = sum(prevout values) - sum(output values)
-    let total_in: u64 = input_values.iter().sum();
-    let total_out: u64 = tx.outputs.iter().map(|o| o.value).sum();
-    let fee = if !is_coinbase && total_in >= total_out {
-        total_in - total_out
-    } else {
-        0u64
-    };
-
-    let ctx = TxContext {
-        tx,
-        input_values,
-        input_scripts,
-        is_coinbase,
-        spendable_out_count,
-        fee,
-        weight,
-        vbytes,
-    };
-
-    let change_result = detect_change(&ctx);
+    let change_result = detect_change(ctx);
 
     // Build script_counts from: output scripts + input prevout scripts (for intra-tx reuse).
     let mut script_counts: HashMap<Vec<u8>, usize> = HashMap::new();
@@ -112,7 +140,7 @@ pub fn analyze_single_tx(tx: &ParsedTx, prevouts: &[PrevoutEntry]) -> Value {
     } else {
         not_detected()
     };
-    let coinjoin_detected = coinjoin_result["detected"].as_bool().unwrap_or(false);
+    let coinjoin_detected = detected(&coinjoin_result);
 
     let consolidation_detected = !is_coinbase && tx.inputs.len() >= 3 && spendable_out_count <= 2;
 
@@ -128,8 +156,13 @@ pub fn analyze_single_tx(tx: &ParsedTx, prevouts: &[PrevoutEntry]) -> Value {
 
     let inscription_result = detect_witness_inscription(tx);
 
-    let inscription_detected = inscription_result["detected"].as_bool().unwrap_or(false);
-    let op_return_protocol = op_return_result["protocol"].as_str().unwrap_or("unknown");
+    let inscription_detected = detected(&inscription_result);
+    let op_return_protocol = op_return_result
+        .get("protocol")
+        .and_then(Value::as_str)
+        .unwrap_or("unknown");
+    // A batch of equal-value ordinals/runes postage outputs looks like a CoinJoin
+    // mix by value alone — suppress the coinjoin signal when either protocol is present.
     let has_ordinals_context =
         inscription_detected || matches!(op_return_protocol, "runes" | "ordinals" | "brc20");
     let (coinjoin_result, coinjoin_detected) = if coinjoin_detected && has_ordinals_context {
@@ -138,7 +171,7 @@ pub fn analyze_single_tx(tx: &ParsedTx, prevouts: &[PrevoutEntry]) -> Value {
         (coinjoin_result, coinjoin_detected)
     };
 
-    let unnecessary_input_result = detect_unnecessary_inputs(&ctx);
+    let unnecessary_input_result = detect_unnecessary_inputs(ctx);
 
     let script_upgrade_result = detect_script_type_upgrade(tx, is_coinbase);
 
@@ -175,10 +208,33 @@ pub fn analyze_single_tx(tx: &ParsedTx, prevouts: &[PrevoutEntry]) -> Value {
         &change_result,
     );
 
+    HeuristicResults {
+        cioh_detected,
+        change_result,
+        reuse_detected,
+        coinjoin_result,
+        consolidation_detected,
+        self_transfer_detected,
+        peeling_chain_detected,
+        op_return_result,
+        round_payment_result,
+        locktime_result,
+        inscription_result,
+        unnecessary_input_result,
+        script_upgrade_result,
+        batch_payment_result,
+        classification,
+        privacy_score,
+    }
+}
+
+pub fn build_response(ctx: &TxContext, results: &HeuristicResults) -> Value {
+    let tx = ctx.tx;
+
     let rbf_signaling = signals_rbf(tx);
 
-    let fee_rate_rounded = if !is_coinbase && vbytes > 0 {
-        let rate = (fee as f64) / (vbytes as f64);
+    let fee_rate_rounded = if !ctx.is_coinbase && ctx.vbytes > 0 {
+        let rate = (ctx.fee as f64) / (ctx.vbytes as f64);
         (rate * 100.0).round() / 100.0
     } else {
         0.0
@@ -226,31 +282,37 @@ pub fn analyze_single_tx(tx: &ParsedTx, prevouts: &[PrevoutEntry]) -> Value {
         "locktime": tx.locktime,
         "is_segwit": tx.is_segwit,
         "rbf_signaling": rbf_signaling,
-        "weight": weight,
-        "vbytes": vbytes,
-        "fee_sats": fee,
+        "weight": ctx.weight,
+        "vbytes": ctx.vbytes,
+        "fee_sats": ctx.fee,
         "fee_rate_sat_vb": fee_rate_rounded,
         "input_count": tx.inputs.len(),
         "output_count": tx.outputs.len(),
         "inputs": inputs_json,
         "outputs": outputs_json,
         "heuristics": {
-            "cioh":                 { "detected": cioh_detected },
-            "change_detection":     change_result,
-            "address_reuse":        { "detected": reuse_detected },
-            "coinjoin":             coinjoin_result,
-            "consolidation":        { "detected": consolidation_detected },
-            "self_transfer":        { "detected": self_transfer_detected },
-            "peeling_chain":        { "detected": peeling_chain_detected },
-            "op_return":            op_return_result,
-            "round_number_payment": round_payment_result,
-            "locktime_analysis":    locktime_result,
-            "inscription":          inscription_result,
-            "unnecessary_input":    unnecessary_input_result,
-            "script_type_upgrade":  script_upgrade_result,
-            "batch_payment":        batch_payment_result,
+            "cioh":                 { "detected": results.cioh_detected },
+            "change_detection":     results.change_result.clone(),
+            "address_reuse":        { "detected": results.reuse_detected },
+            "coinjoin":             results.coinjoin_result.clone(),
+            "consolidation":        { "detected": results.consolidation_detected },
+            "self_transfer":        { "detected": results.self_transfer_detected },
+            "peeling_chain":        { "detected": results.peeling_chain_detected },
+            "op_return":            results.op_return_result.clone(),
+            "round_number_payment": results.round_payment_result.clone(),
+            "locktime_analysis":    results.locktime_result.clone(),
+            "inscription":          results.inscription_result.clone(),
+            "unnecessary_input":    results.unnecessary_input_result.clone(),
+            "script_type_upgrade":  results.script_upgrade_result.clone(),
+            "batch_payment":        results.batch_payment_result.clone(),
         },
-        "classification": classification,
-        "privacy_score": privacy_score.unwrap_or(0),
+        "classification": results.classification,
+        "privacy_score": results.privacy_score.unwrap_or(0),
     })
+}
+
+pub fn analyze_single_tx(tx: &ParsedTx, prevouts: &[PrevoutEntry]) -> Value {
+    let ctx = TxContext::new(tx, prevouts);
+    let results = run_heuristics(&ctx);
+    build_response(&ctx, &results)
 }

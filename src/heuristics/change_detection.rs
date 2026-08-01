@@ -9,7 +9,7 @@ use super::common::{
     is_spendable, not_detected, DUST_FLOOR_LEGACY_SATS, DUST_FLOOR_P2WPKH_P2TR_SATS,
     DUST_FLOOR_P2WSH_SATS,
 };
-use super::shared::TxContext;
+use super::analysis::TxContext;
 
 pub fn detect_change(ctx: &TxContext) -> Value {
     let tx = ctx.tx;

@@ -3,7 +3,7 @@
 use serde_json::{json, Value};
 
 use super::common::not_detected;
-use super::shared::TxContext;
+use super::analysis::TxContext;
 
 pub fn detect_unnecessary_inputs(ctx: &TxContext) -> Value {
     let tx = ctx.tx;
