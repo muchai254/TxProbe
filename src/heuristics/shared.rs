@@ -14,6 +14,7 @@ use super::batch_payment::detect_batch_payment;
 use super::change_detection::detect_change;
 use super::classification::{classify_tx, compute_privacy_score, infer_input_script_type};
 use super::coinjoin::detect_coinjoin;
+use super::common::{is_spendable, not_detected, signals_rbf, COINBASE_VOUT};
 use super::inscription::detect_witness_inscription;
 use super::locktime::detect_locktime_analysis;
 use super::op_return::detect_op_return;
@@ -69,13 +70,9 @@ pub fn analyze_single_tx(tx: &ParsedTx, prevouts: &[PrevoutEntry]) -> Value {
 
     let is_coinbase = tx.inputs.len() == 1
         && tx.inputs[0].txid_bytes == [0u8; 32]
-        && tx.inputs[0].vout == 0xFFFFFFFF;
+        && tx.inputs[0].vout == COINBASE_VOUT;
 
-    let spendable_out_count = tx
-        .outputs
-        .iter()
-        .filter(|o| classify_script(&o.script_pubkey) != "op_return")
-        .count();
+    let spendable_out_count = tx.outputs.iter().filter(|o| is_spendable(o)).count();
 
     let cioh_detected = !is_coinbase && tx.inputs.len() > 1;
 
@@ -96,8 +93,7 @@ pub fn analyze_single_tx(tx: &ParsedTx, prevouts: &[PrevoutEntry]) -> Value {
     // Build script_counts from: output scripts + input prevout scripts (for intra-tx reuse).
     let mut script_counts: HashMap<Vec<u8>, usize> = HashMap::new();
     for out in &tx.outputs {
-        let stype = classify_script(&out.script_pubkey);
-        if !out.script_pubkey.is_empty() && stype != "op_return" {
+        if !out.script_pubkey.is_empty() && is_spendable(out) {
             *script_counts.entry(out.script_pubkey.clone()).or_insert(0) += 1;
         }
     }
@@ -112,7 +108,7 @@ pub fn analyze_single_tx(tx: &ParsedTx, prevouts: &[PrevoutEntry]) -> Value {
     let reuse_detected = !is_coinbase
         && tx.outputs.iter().any(|o| {
             !o.script_pubkey.is_empty()
-                && classify_script(&o.script_pubkey) != "op_return"
+                && is_spendable(o)
                 && (*script_counts.get(&o.script_pubkey).unwrap_or(&0) > 1
                     || input_script_set.contains(&o.script_pubkey))
         });
@@ -120,7 +116,7 @@ pub fn analyze_single_tx(tx: &ParsedTx, prevouts: &[PrevoutEntry]) -> Value {
     let coinjoin_result = if !is_coinbase {
         detect_coinjoin(tx)
     } else {
-        json!({ "detected": false })
+        not_detected()
     };
     let coinjoin_detected = coinjoin_result["detected"].as_bool().unwrap_or(false);
 
@@ -143,7 +139,7 @@ pub fn analyze_single_tx(tx: &ParsedTx, prevouts: &[PrevoutEntry]) -> Value {
     let has_ordinals_context =
         inscription_detected || matches!(op_return_protocol, "runes" | "ordinals" | "brc20");
     let (coinjoin_result, coinjoin_detected) = if coinjoin_detected && has_ordinals_context {
-        (json!({ "detected": false }), false)
+        (not_detected(), false)
     } else {
         (coinjoin_result, coinjoin_detected)
     };
@@ -185,7 +181,7 @@ pub fn analyze_single_tx(tx: &ParsedTx, prevouts: &[PrevoutEntry]) -> Value {
         &change_result,
     );
 
-    let rbf_signaling = tx.inputs.iter().any(|inp| inp.sequence < 0xFFFFFFFE);
+    let rbf_signaling = signals_rbf(tx);
 
     let fee_rate_rounded = if !is_coinbase && vbytes > 0 {
         let rate = (fee as f64) / (vbytes as f64);

@@ -1,9 +1,10 @@
 // CoinJoin detection heuristic
 
-use crate::script::classify_script;
 use crate::tx::ParsedTx;
 use serde_json::{json, Value};
 use std::collections::HashMap;
+
+use super::common::{not_detected, spendable_values};
 
 // Minimum denomination for a valid CoinJoin mixing output.
 
@@ -11,18 +12,13 @@ pub const COINJOIN_MIN_DENOM_SATS: u64 = 10_000;
 
 pub fn detect_coinjoin(tx: &ParsedTx) -> Value {
     if tx.inputs.len() < 3 {
-        return json!({ "detected": false });
+        return not_detected();
     }
 
-    let values: Vec<u64> = tx
-        .outputs
-        .iter()
-        .filter(|o| classify_script(&o.script_pubkey) != "op_return")
-        .map(|o| o.value)
-        .collect();
+    let values = spendable_values(tx);
 
     if values.len() < 2 {
-        return json!({ "detected": false });
+        return not_detected();
     }
 
     let mut counts: HashMap<u64, usize> = HashMap::new();
@@ -38,7 +34,7 @@ pub fn detect_coinjoin(tx: &ParsedTx) -> Value {
 
     let (mixing_denomination_sats, equal_output_count) = match best {
         Some(pair) => pair,
-        None => return json!({ "detected": false }),
+        None => return not_detected(),
     };
 
     let total_input_count = tx.inputs.len();

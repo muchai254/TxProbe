@@ -1,19 +1,15 @@
 // Peeling chain detection heuristic
 
-use crate::script::classify_script;
 use crate::tx::ParsedTx;
+
+use super::common::spendable_values;
 
 pub fn detect_peeling_chain(tx: &ParsedTx, spendable_out_count: usize) -> bool {
     if tx.inputs.len() > 2 || spendable_out_count != 2 {
         return false;
     }
 
-    let values: Vec<u64> = tx
-        .outputs
-        .iter()
-        .filter(|o| classify_script(&o.script_pubkey) != "op_return")
-        .map(|o| o.value)
-        .collect();
+    let values = spendable_values(tx);
 
     if values.len() != 2 {
         return false;

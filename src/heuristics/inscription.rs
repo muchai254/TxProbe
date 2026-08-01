@@ -3,6 +3,8 @@
 use crate::tx::ParsedTx;
 use serde_json::{json, Value};
 
+use super::common::not_detected;
+
 fn decode_push(script: &[u8], pos: usize) -> Option<(usize, usize)> {
     let op = *script.get(pos)?;
     match op {
@@ -65,5 +67,5 @@ pub fn detect_witness_inscription(tx: &ParsedTx) -> Value {
         }
     }
 
-    json!({ "detected": false })
+    not_detected()
 }

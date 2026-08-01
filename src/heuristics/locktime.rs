@@ -3,16 +3,18 @@
 use crate::tx::ParsedTx;
 use serde_json::{json, Value};
 
+use super::common::{not_detected, signals_rbf, LOCKTIME_TIMESTAMP_THRESHOLD};
+
 pub fn detect_locktime_analysis(tx: &ParsedTx, is_coinbase: bool, block_height: i64) -> Value {
     if is_coinbase {
-        return json!({ "detected": false });
+        return not_detected();
     }
 
     let locktime = tx.locktime;
 
     let locktime_type = if locktime == 0 {
         "none"
-    } else if locktime < 500_000_000 {
+    } else if locktime < LOCKTIME_TIMESTAMP_THRESHOLD {
         "block_height"
     } else {
         "unix_timestamp"
@@ -21,7 +23,7 @@ pub fn detect_locktime_analysis(tx: &ParsedTx, is_coinbase: bool, block_height: 
     let anti_fee_sniping =
         locktime_type == "block_height" && block_height > 0 && locktime as i64 == block_height - 1;
 
-    let rbf_signaling = tx.inputs.iter().any(|inp| inp.sequence < 0xFFFFFFFE);
+    let rbf_signaling = signals_rbf(tx);
 
     let wallet_fingerprint = if anti_fee_sniping && rbf_signaling {
         "anti_fee_sniping_rbf"

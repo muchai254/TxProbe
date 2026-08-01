@@ -4,6 +4,8 @@ use crate::tx::{ParsedTx, TxInput};
 use serde_json::Value;
 use std::collections::HashMap;
 
+use super::common::signals_rbf;
+
 // Infer the script type an input is spending from witness/scriptSig structure alone.
 pub fn infer_input_script_type(input: &TxInput) -> &'static str {
     let has_witness = !input.witness.is_empty();
@@ -105,7 +107,7 @@ pub fn compute_privacy_score(
         return None;
     }
 
-    let rbf_signaling = tx.inputs.iter().any(|inp| inp.sequence < 0xFFFFFFFE);
+    let rbf_signaling = signals_rbf(tx);
     let bip69 = is_bip69_sorted(tx);
 
     let change_confidence = match change_result.get("detected").and_then(|v| v.as_bool()) {

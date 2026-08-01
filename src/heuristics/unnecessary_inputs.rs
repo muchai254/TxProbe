@@ -3,28 +3,30 @@
 use crate::tx::ParsedTx;
 use serde_json::{json, Value};
 
+use super::common::not_detected;
+
 pub fn detect_unnecessary_inputs(tx: &ParsedTx, is_coinbase: bool) -> Value {
     if is_coinbase {
-        return json!({ "detected": false });
+        return not_detected();
     }
 
     if tx.input_values.is_empty() {
-        return json!({ "detected": false });
+        return not_detected();
     }
 
     if tx.inputs.len() != tx.input_values.len() {
-        return json!({ "detected": false });
+        return not_detected();
     }
 
     if tx.inputs.len() < 2 {
-        return json!({ "detected": false });
+        return not_detected();
     }
 
     let total_inputs: u64 = tx.input_values.iter().sum();
     let total_outputs: u64 = tx.outputs.iter().map(|o| o.value).sum();
 
     if total_inputs < total_outputs {
-        return json!({ "detected": false });
+        return not_detected();
     }
 
     let mut unnecessary: Vec<usize> = Vec::new();
@@ -36,7 +38,7 @@ pub fn detect_unnecessary_inputs(tx: &ParsedTx, is_coinbase: bool) -> Value {
     }
 
     if unnecessary.is_empty() {
-        return json!({ "detected": false });
+        return not_detected();
     }
 
     let unnecessary_count = unnecessary.len();

@@ -6,21 +6,25 @@ use crate::varint::compact_size_len;
 use serde_json::{json, Value};
 
 use super::classification::{dominant_input_type, is_bip69_sorted};
+use super::common::{
+    is_spendable, not_detected, DUST_FLOOR_LEGACY_SATS, DUST_FLOOR_P2WPKH_P2TR_SATS,
+    DUST_FLOOR_P2WSH_SATS,
+};
 
 pub fn detect_change(tx: &ParsedTx, is_coinbase: bool, fee: u64, vbytes: u64) -> Value {
     if is_coinbase || tx.inputs.is_empty() || tx.outputs.is_empty() {
-        return json!({ "detected": false });
+        return not_detected();
     }
 
     let spendable: Vec<(usize, &crate::tx::TxOutput)> = tx
         .outputs
         .iter()
         .enumerate()
-        .filter(|(_, o)| classify_script(&o.script_pubkey) != "op_return")
+        .filter(|(_, o)| is_spendable(o))
         .collect();
 
     if spendable.len() < 2 {
-        return json!({ "detected": false });
+        return not_detected();
     }
 
     let bip69 = is_bip69_sorted(tx);
@@ -80,9 +84,9 @@ pub fn detect_change(tx: &ParsedTx, is_coinbase: bool, fee: u64, vbytes: u64) ->
             let marginal_cost = fee_rate * out_vbytes as f64;
 
             let dust = match cand_type {
-                "p2wpkh" | "p2tr" => 294u64,
-                "p2wsh" => 330u64,
-                _ => 546u64,
+                "p2wpkh" | "p2tr" => DUST_FLOOR_P2WPKH_P2TR_SATS,
+                "p2wsh" => DUST_FLOOR_P2WSH_SATS,
+                _ => DUST_FLOOR_LEGACY_SATS,
             };
             let floor = dust.max(marginal_cost.ceil() as u64);
 
@@ -103,7 +107,7 @@ pub fn detect_change(tx: &ParsedTx, is_coinbase: bool, fee: u64, vbytes: u64) ->
     }
 
     if best_score < 0.20 || best_idx.is_none() {
-        return json!({ "detected": false });
+        return not_detected();
     }
 
     let confidence = if best_score >= 0.75 {

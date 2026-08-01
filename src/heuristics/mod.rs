@@ -2,6 +2,7 @@ mod batch_payment;
 mod change_detection;
 mod classification;
 mod coinjoin;
+mod common;
 mod inscription;
 mod locktime;
 mod op_return;

@@ -5,10 +5,11 @@ use crate::tx::ParsedTx;
 use serde_json::{json, Value};
 
 use super::classification::infer_input_script_type;
+use super::common::not_detected;
 
 pub fn detect_script_type_upgrade(tx: &ParsedTx, is_coinbase: bool) -> Value {
     if is_coinbase || tx.inputs.is_empty() || tx.outputs.is_empty() {
-        return json!({ "detected": false });
+        return not_detected();
     }
 
     const SEGWIT_NATIVE: &[&str] = &["p2wpkh", "p2wsh", "p2tr"];
@@ -19,7 +20,7 @@ pub fn detect_script_type_upgrade(tx: &ParsedTx, is_coinbase: bool) -> Value {
         .all(|inp| !SEGWIT_NATIVE.contains(&infer_input_script_type(inp)));
 
     if !all_legacy {
-        return json!({ "detected": false });
+        return not_detected();
     }
 
     let mut to_types: Vec<&str> = Vec::new();
@@ -31,7 +32,7 @@ pub fn detect_script_type_upgrade(tx: &ParsedTx, is_coinbase: bool) -> Value {
     }
 
     if to_types.is_empty() {
-        return json!({ "detected": false });
+        return not_detected();
     }
     to_types.sort_unstable();
 
