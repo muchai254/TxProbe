@@ -17,6 +17,10 @@ export type HeuristicId =
 export interface HeuristicResult {
   detected: boolean
   confidence?: string
+  // The only per-heuristic payload field actually read by the UI (TxGraph, to mark
+  // the change output). The other 13 heuristics' extra fields go unread, so a full
+  // discriminated union over all of them isn't worth it — see the index signature below.
+  likely_change_index?: number
   [key: string]: unknown
 }
 

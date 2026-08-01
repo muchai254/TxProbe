@@ -282,9 +282,7 @@ export default function TxGraph({
           const x = svgWidth - PADDING_H - NODE_W
           const changeResult = heuristics.change_detection
           const isChange =
-            changeResult?.detected &&
-            (changeResult as { likely_change_index?: number })
-              .likely_change_index === i
+            changeResult?.detected && changeResult.likely_change_index === i
           return (
             <g key={`out-${i}`}>
               <rect
