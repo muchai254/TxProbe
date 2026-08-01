@@ -1,14 +1,10 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
 /* ==========================================================================
    Vendored reset (Tailwind Preflight, v3.4.19)
    ==========================================================================
    The app visibly depends on this — in particular the button/input font and
-   padding/margin reset below. Vendored verbatim (values resolved against
-   this project's tailwind.config.js) so it survives Tailwind's removal.
-   Source: node_modules/tailwindcss/lib/css/preflight.css
+   padding/margin reset below. Copied verbatim from Tailwind's generated
+   output (values resolved against the tailwind.config.js this project used
+   to have) before Tailwind itself was removed.
    ========================================================================== */
 
 *,
