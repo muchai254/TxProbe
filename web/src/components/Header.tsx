@@ -5,7 +5,6 @@ interface HeaderProps {
   onBack?: () => void;
   backLabel?: string;
   contextId?: string;
-  contextType?: 'txid' | 'xpub';
   showCopy?: boolean;
   showExternal?: boolean;
   externalUrl?: string;
@@ -20,14 +19,11 @@ export default function Header({
   onBack,
   backLabel,
   contextId,
-  contextType = 'txid',
   showCopy = false,
   showExternal = false,
   externalUrl,
 }: HeaderProps) {
   const [copied, setCopied] = useState(false)
-
-  void contextType
 
   function handleCopy() {
     if (!contextId) return

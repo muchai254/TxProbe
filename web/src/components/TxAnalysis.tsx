@@ -62,7 +62,7 @@ export default function TxAnalysis({ txid, source, onBack }: Props) {
   if (state.status === 'error') {
     return (
       <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: 'var(--color-bg)' }}>
-        <Header onBack={onBack} backLabel={backLabel} contextId={txid} contextType="txid" />
+        <Header onBack={onBack} backLabel={backLabel} contextId={txid} />
         <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 'var(--space-4)' }}>
           <p style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--text-base)', color: 'var(--color-text-muted)', margin: 0 }}>
             {state.message}
@@ -93,7 +93,6 @@ export default function TxAnalysis({ txid, source, onBack }: Props) {
         onBack={onBack}
         backLabel={backLabel}
         contextId={txid}
-        contextType="txid"
         showCopy={true}
         showExternal={true}
         externalUrl={`https://mempool.space/tx/${txid}`}
@@ -110,8 +109,6 @@ export default function TxAnalysis({ txid, source, onBack }: Props) {
             privacyScore={data.privacy_score}
             heuristics={data.heuristics}
             detectedHeuristics={detectedHeuristics}
-            highlightedInput={null}
-            highlightedOutput={null}
           />
         )}
       </div>

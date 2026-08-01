@@ -65,13 +65,12 @@ export function TxLoadingState({ phase }: TxLoadingProps) {
 }
 
 interface WalletLoadingProps {
-  phase: 'deriving' | 'fetching' | 'analyzing';
-  derivationPath?: string;
+  phase: 'fetching' | 'analyzing';
   fetchProgress?: { done: number; total: number };
   analysisProgress?: { done: number; total: number };
 }
 
-export function WalletLoadingState({ phase, derivationPath, fetchProgress, analysisProgress }: WalletLoadingProps) {
+export function WalletLoadingState({ phase, fetchProgress, analysisProgress }: WalletLoadingProps) {
   return (
     <div style={{
       display: 'flex',
@@ -82,16 +81,6 @@ export function WalletLoadingState({ phase, derivationPath, fetchProgress, analy
       fontSize: 'var(--text-sm)',
       padding: 'var(--space-8)',
     }}>
-      {phase === 'deriving' && (
-        <>
-          <p style={{ margin: 0, color: 'var(--color-text)' }}>Deriving addresses...</p>
-          {derivationPath && (
-            <p style={{ margin: 0, color: 'var(--color-signal)', fontSize: 'var(--text-xs)' }}>
-              {derivationPath}
-            </p>
-          )}
-        </>
-      )}
       {phase === 'fetching' && fetchProgress && (
         <>
           <p style={{ margin: 0, color: 'var(--color-text)' }}>Fetching transaction history...</p>

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { Search, ArrowRight, Fingerprint } from 'lucide-react'
 import type { AppMode } from '../lib/types'
 import { fetchSamples } from '../lib/api'
@@ -90,7 +90,6 @@ export default function Landing({ onTxSubmit, onAddressSubmit }: LandingProps) {
   const [shaking, setShaking] = useState(false)
   const [samples, setSamples] = useState<Samples | null>(null)
   const [samplesLoading, setSamplesLoading] = useState(true)
-  const inputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     setSamplesLoading(true)
@@ -235,7 +234,6 @@ export default function Landing({ onTxSubmit, onAddressSubmit }: LandingProps) {
               style={{ position: 'absolute', left: '14px', color: 'var(--color-text-muted)', pointerEvents: 'none', flexShrink: 0 }}
             />
             <input
-              ref={inputRef}
               type="text"
               value={value}
               onChange={e => { setValue(e.target.value); setError(null) }}

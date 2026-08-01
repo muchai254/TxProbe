@@ -7,10 +7,6 @@ interface TxGraphProps {
   privacyScore: number;
   heuristics: Record<HeuristicId, HeuristicResult>;
   detectedHeuristics: HeuristicId[];
-  onInputClick?: (index: number) => void;
-  onOutputClick?: (index: number) => void;
-  highlightedInput: number | null;
-  highlightedOutput: number | null;
 }
 
 const NODE_W = 140;
@@ -39,10 +35,6 @@ export default function TxGraph({
   privacyScore,
   heuristics,
   detectedHeuristics,
-  onInputClick,
-  onOutputClick,
-  highlightedInput: _highlightedInput,
-  highlightedOutput: _highlightedOutput,
 }: TxGraphProps) {
   const [assembled, setAssembled] = useState(false)
   const [signaled, setSignaled] = useState(false)
@@ -129,11 +121,7 @@ export default function TxGraph({
         {visibleInputs.map((inp, i) => {
           const y = inputY(i)
           return (
-            <g
-              key={`inp-${i}`}
-              onClick={() => onInputClick?.(i)}
-              style={{ cursor: onInputClick ? 'pointer' : 'default' }}
-            >
+            <g key={`inp-${i}`}>
               <rect
                 x={PADDING_H} y={y} width={NODE_W} height={NODE_H} rx={NODE_RADIUS}
                 fill="var(--color-surface)"
@@ -196,11 +184,7 @@ export default function TxGraph({
           const changeResult = heuristics.change_detection
           const isChange = changeResult?.detected && (changeResult as { likely_change_index?: number }).likely_change_index === i
           return (
-            <g
-              key={`out-${i}`}
-              onClick={() => onOutputClick?.(i)}
-              style={{ cursor: onOutputClick ? 'pointer' : 'default' }}
-            >
+            <g key={`out-${i}`}>
               <rect
                 x={x} y={y} width={NODE_W} height={NODE_H} rx={NODE_RADIUS}
                 fill="var(--color-surface)"
