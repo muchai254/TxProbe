@@ -1,6 +1,0 @@
-# Commits listed here are ignored by `git blame --ignore-revs-file .git-blame-ignore-revs`
-# (or automatically if you run `git config blame.ignoreRevsFile .git-blame-ignore-revs`).
-# Only add commits that are formatting-only, with zero logic changes.
-
-# TODO: replace with the actual hash after committing Step 4.3 (cargo fmt + prettier --write)
-0000000000000000000000000000000000000000
