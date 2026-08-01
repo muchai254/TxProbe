@@ -1,14 +1,15 @@
 // OP_RETURN detection heuristic
 
 use crate::script::{extract_op_return_payload, op_return_protocol_raw};
-use crate::tx::ParsedTx;
 use serde_json::{json, Value};
 
+use super::analysis::TxContext;
 use super::common::{is_spendable, not_detected};
 
 // Detect OP_RETURN outputs and classify the embedded protocol.
-pub fn detect_op_return(tx: &ParsedTx) -> Value {
-    let first_op_return = tx
+pub fn detect(ctx: &TxContext) -> Value {
+    let first_op_return = ctx
+        .tx
         .outputs
         .iter()
         .enumerate()

@@ -4,14 +4,14 @@ use crate::script::classify_script;
 use crate::varint::compact_size_len;
 use serde_json::{json, Value};
 
+use super::analysis::TxContext;
 use super::classification::{dominant_input_type, is_bip69_sorted};
 use super::common::{
     is_spendable, not_detected, DUST_FLOOR_LEGACY_SATS, DUST_FLOOR_P2WPKH_P2TR_SATS,
     DUST_FLOOR_P2WSH_SATS,
 };
-use super::analysis::TxContext;
 
-pub fn detect_change(ctx: &TxContext) -> Value {
+pub fn detect(ctx: &TxContext) -> Value {
     let tx = ctx.tx;
     let (is_coinbase, fee, vbytes) = (ctx.is_coinbase, ctx.fee, ctx.vbytes);
     if is_coinbase || tx.inputs.is_empty() || tx.outputs.is_empty() {

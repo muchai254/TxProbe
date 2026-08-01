@@ -1,14 +1,15 @@
 // Script type upgrade detection heuristic
 
 use crate::script::classify_script;
-use crate::tx::ParsedTx;
 use serde_json::{json, Value};
 
+use super::analysis::TxContext;
 use super::classification::infer_input_script_type;
 use super::common::not_detected;
 
-pub fn detect_script_type_upgrade(tx: &ParsedTx, is_coinbase: bool) -> Value {
-    if is_coinbase || tx.inputs.is_empty() || tx.outputs.is_empty() {
+pub fn detect(ctx: &TxContext) -> Value {
+    let tx = ctx.tx;
+    if ctx.is_coinbase || tx.inputs.is_empty() || tx.outputs.is_empty() {
         return not_detected();
     }
 

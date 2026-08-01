@@ -1,16 +1,17 @@
 // CoinJoin detection heuristic
 
-use crate::tx::ParsedTx;
 use serde_json::{json, Value};
 use std::collections::HashMap;
 
+use super::analysis::TxContext;
 use super::common::{not_detected, spendable_values};
 
 // Minimum denomination for a valid CoinJoin mixing output.
 
 pub const COINJOIN_MIN_DENOM_SATS: u64 = 10_000;
 
-pub fn detect_coinjoin(tx: &ParsedTx) -> Value {
+pub fn detect(ctx: &TxContext) -> Value {
+    let tx = ctx.tx;
     if tx.inputs.len() < 3 {
         return not_detected();
     }

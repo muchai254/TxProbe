@@ -1,14 +1,15 @@
 // Round payment detection heuristic
 
-use crate::tx::ParsedTx;
 use serde_json::{json, Value};
 
+use super::analysis::TxContext;
 use super::common::{is_spendable, not_detected};
 
 const THRESHOLD: u64 = 1_000_000; // 0.01 BTC
 
-pub fn detect_round_payment(tx: &ParsedTx, is_coinbase: bool) -> Value {
-    if is_coinbase || tx.outputs.is_empty() {
+pub fn detect(ctx: &TxContext) -> Value {
+    let tx = ctx.tx;
+    if ctx.is_coinbase || tx.outputs.is_empty() {
         return not_detected();
     }
 

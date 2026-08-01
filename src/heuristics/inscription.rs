@@ -1,8 +1,8 @@
 // Witness-based inscription (Ordinals / BRC-20) detection
 
-use crate::tx::ParsedTx;
 use serde_json::{json, Value};
 
+use super::analysis::TxContext;
 use super::common::not_detected;
 
 fn decode_push(script: &[u8], pos: usize) -> Option<(usize, usize)> {
@@ -36,11 +36,11 @@ fn extract_inscription_content_type(script: &[u8], after_tag: usize) -> Option<S
     String::from_utf8(script[ct_start..ct_start + ct_len].to_vec()).ok()
 }
 
-pub fn detect_witness_inscription(tx: &ParsedTx) -> Value {
+pub fn detect(ctx: &TxContext) -> Value {
     const ORD_MARKER: &[u8] = &[0x63, 0x03, 0x6f, 0x72, 0x64];
     const BRC20_TAG: &[u8] = b"brc-20";
 
-    for input in &tx.inputs {
+    for input in &ctx.tx.inputs {
         for item in &input.witness {
             if item.len() < 5 {
                 continue;

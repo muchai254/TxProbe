@@ -1,12 +1,13 @@
 // Locktime analysis heuristic
 
-use crate::tx::ParsedTx;
 use serde_json::{json, Value};
 
+use super::analysis::TxContext;
 use super::common::{not_detected, signals_rbf, LOCKTIME_TIMESTAMP_THRESHOLD};
 
-pub fn detect_locktime_analysis(tx: &ParsedTx, is_coinbase: bool, block_height: i64) -> Value {
-    if is_coinbase {
+pub fn detect(ctx: &TxContext) -> Value {
+    let tx = ctx.tx;
+    if ctx.is_coinbase {
         return not_detected();
     }
 
@@ -20,6 +21,9 @@ pub fn detect_locktime_analysis(tx: &ParsedTx, is_coinbase: bool, block_height: 
         "unix_timestamp"
     };
 
+    // block_height is never wired in from the caller (hard-coded to 0), so
+    // anti_fee_sniping can never be true. See plan.md appendix item 1.
+    let block_height: i64 = 0;
     let anti_fee_sniping =
         locktime_type == "block_height" && block_height > 0 && locktime as i64 == block_height - 1;
 

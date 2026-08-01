@@ -1,18 +1,21 @@
 // Peeling chain detection heuristic
 
-use crate::tx::ParsedTx;
+use serde_json::{json, Value};
 
-use super::common::spendable_values;
+use super::analysis::TxContext;
+use super::common::{not_detected, spendable_values};
 
-pub fn detect_peeling_chain(tx: &ParsedTx, spendable_out_count: usize) -> bool {
-    if tx.inputs.len() > 2 || spendable_out_count != 2 {
-        return false;
+pub fn detect(ctx: &TxContext) -> Value {
+    // A 1-input, 2-output coinbase would otherwise match the shape checked below —
+    // this used to be excluded by the caller instead of here.
+    if ctx.is_coinbase || ctx.tx.inputs.len() > 2 || ctx.spendable_out_count != 2 {
+        return not_detected();
     }
 
-    let values = spendable_values(tx);
+    let values = spendable_values(ctx.tx);
 
     if values.len() != 2 {
-        return false;
+        return not_detected();
     }
 
     let (min_val, max_val) = if values[0] < values[1] {
@@ -21,5 +24,5 @@ pub fn detect_peeling_chain(tx: &ParsedTx, spendable_out_count: usize) -> bool {
         (values[1], values[0])
     };
 
-    min_val > 0 && max_val / min_val >= 10
+    json!({ "detected": min_val > 0 && max_val / min_val >= 10 })
 }

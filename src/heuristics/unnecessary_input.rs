@@ -2,10 +2,10 @@
 
 use serde_json::{json, Value};
 
-use super::common::not_detected;
 use super::analysis::TxContext;
+use super::common::not_detected;
 
-pub fn detect_unnecessary_inputs(ctx: &TxContext) -> Value {
+pub fn detect(ctx: &TxContext) -> Value {
     let tx = ctx.tx;
     if ctx.is_coinbase {
         return not_detected();
