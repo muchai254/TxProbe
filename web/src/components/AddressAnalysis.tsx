@@ -10,16 +10,16 @@ import PageShell from './ui/PageShell'
 import SecondaryButton from './ui/SecondaryButton'
 
 interface Props {
-  address: string;
-  onBack: () => void;
-  onTxClick: (txid: string) => void;
+  address: string
+  onBack: () => void
+  onTxClick: (txid: string) => void
 }
 
 type State =
   | { status: 'fetching' }
   | { status: 'analyzing'; transactions: TxSummary[]; analyzedCount: number }
   | { status: 'success'; transactions: TxSummary[]; stats: AddressStats }
-  | { status: 'error'; message: string };
+  | { status: 'error'; message: string }
 
 export default function AddressAnalysis({ address, onBack, onTxClick }: Props) {
   const [state, setState] = useState<State>({ status: 'fetching' })
@@ -37,14 +37,18 @@ export default function AddressAnalysis({ address, onBack, onTxClick }: Props) {
         txSummaries = await fetchAddressTxs(address)
       } catch (err) {
         if (!abortRef.current) {
-          setState({ status: 'error', message: (err as Error).message || 'Failed to fetch transactions.' })
+          setState({
+            status: 'error',
+            message: (err as Error).message || 'Failed to fetch transactions.',
+          })
         }
         return
       }
 
       if (txSummaries.length === 0) {
         const stats = computeStats([], 0)
-        if (!abortRef.current) setState({ status: 'success', transactions: [], stats })
+        if (!abortRef.current)
+          setState({ status: 'success', transactions: [], stats })
         return
       }
 
@@ -63,12 +67,20 @@ export default function AddressAnalysis({ address, onBack, onTxClick }: Props) {
             .filter(([, v]) => v.detected)
             .map(([k]) => k as HeuristicId)
 
-          results[i] = { ...results[i], privacy_score: score, detected_heuristics: detected }
+          results[i] = {
+            ...results[i],
+            privacy_score: score,
+            detected_heuristics: detected,
+          }
         } catch {
           // Keep original placeholder for this tx
         }
         if (!abortRef.current) {
-          setState({ status: 'analyzing', transactions: [...results], analyzedCount: i + 1 })
+          setState({
+            status: 'analyzing',
+            transactions: [...results],
+            analyzedCount: i + 1,
+          })
         }
       }
 
@@ -79,7 +91,9 @@ export default function AddressAnalysis({ address, onBack, onTxClick }: Props) {
     }
 
     run()
-    return () => { abortRef.current = true }
+    return () => {
+      abortRef.current = true
+    }
   }, [address])
 
   const header = <Header onBack={onBack} contextId={address} backLabel="Back" />
@@ -87,8 +101,18 @@ export default function AddressAnalysis({ address, onBack, onTxClick }: Props) {
   if (state.status === 'fetching') {
     return (
       <PageShell header={header}>
-        <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <WalletLoadingState phase="fetching" fetchProgress={{ done: 0, total: 1 }} />
+        <div
+          style={{
+            flex: 1,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <WalletLoadingState
+            phase="fetching"
+            fetchProgress={{ done: 0, total: 1 }}
+          />
         </div>
       </PageShell>
     )
@@ -97,7 +121,14 @@ export default function AddressAnalysis({ address, onBack, onTxClick }: Props) {
   if (state.status === 'analyzing') {
     return (
       <PageShell header={header}>
-        <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div
+          style={{
+            flex: 1,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
           <WalletLoadingState
             phase="analyzing"
             analysisProgress={{
@@ -113,15 +144,26 @@ export default function AddressAnalysis({ address, onBack, onTxClick }: Props) {
   if (state.status === 'error') {
     return (
       <PageShell header={header}>
-        <div style={{
-          flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center',
-          flexDirection: 'column', gap: 'var(--space-4)',
-        }}>
-          <p style={{
-            fontSize: 'var(--text-base)',
-            color: 'var(--color-text-muted)', margin: 0, maxWidth: '400px',
-            textAlign: 'center', lineHeight: 1.6,
-          }}>
+        <div
+          style={{
+            flex: 1,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexDirection: 'column',
+            gap: 'var(--space-4)',
+          }}
+        >
+          <p
+            style={{
+              fontSize: 'var(--text-base)',
+              color: 'var(--color-text-muted)',
+              margin: 0,
+              maxWidth: '400px',
+              textAlign: 'center',
+              lineHeight: 1.6,
+            }}
+          >
             {state.message}
           </p>
           <SecondaryButton onClick={onBack}>Back</SecondaryButton>
@@ -145,7 +187,7 @@ export default function AddressAnalysis({ address, onBack, onTxClick }: Props) {
           onFilterChange={setActiveFilter}
           onTxClick={onTxClick}
           visibleCount={visibleCount}
-          onLoadMore={() => setVisibleCount(c => c + 50)}
+          onLoadMore={() => setVisibleCount((c) => c + 50)}
         />
       </div>
     </PageShell>

@@ -3,7 +3,10 @@ import { ChevronDown } from 'lucide-react'
 
 const Accordion = AccordionPrimitive.Root
 
-function AccordionItem({ children, ...props }: React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Item>) {
+function AccordionItem({
+  children,
+  ...props
+}: React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Item>) {
   return (
     <AccordionPrimitive.Item
       style={{ borderBottom: 'var(--border-hairline)' }}
@@ -14,7 +17,10 @@ function AccordionItem({ children, ...props }: React.ComponentPropsWithoutRef<ty
   )
 }
 
-function AccordionTrigger({ children, ...props }: React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Trigger>) {
+function AccordionTrigger({
+  children,
+  ...props
+}: React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Trigger>) {
   return (
     <AccordionPrimitive.Header style={{ display: 'flex', margin: 0 }}>
       <AccordionPrimitive.Trigger
@@ -48,19 +54,24 @@ function AccordionTrigger({ children, ...props }: React.ComponentPropsWithoutRef
   )
 }
 
-function AccordionContent({ children, ...props }: React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Content>) {
+function AccordionContent({
+  children,
+  ...props
+}: React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Content>) {
   return (
     <AccordionPrimitive.Content
       className="accordion-content"
       style={{ overflow: 'hidden' }}
       {...props}
     >
-      <div style={{
-        paddingBottom: 'var(--space-4)',
-        fontSize: 'var(--text-sm)',
-        color: 'var(--color-text-muted)',
-        lineHeight: 1.7,
-      }}>
+      <div
+        style={{
+          paddingBottom: 'var(--space-4)',
+          fontSize: 'var(--text-sm)',
+          color: 'var(--color-text-muted)',
+          lineHeight: 1.7,
+        }}
+      >
         {children}
       </div>
     </AccordionPrimitive.Content>

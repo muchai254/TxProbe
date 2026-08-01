@@ -17,7 +17,7 @@
 }
 :before,
 :after {
-  --tw-content: "";
+  --tw-content: '';
 }
 html,
 :host {
@@ -30,10 +30,10 @@ html,
     ui-sans-serif,
     system-ui,
     sans-serif,
-    "Apple Color Emoji",
-    "Segoe UI Emoji",
+    'Apple Color Emoji',
+    'Segoe UI Emoji',
     Segoe UI Symbol,
-    "Noto Color Emoji";
+    'Noto Color Emoji';
   font-feature-settings: normal;
   font-variation-settings: normal;
   -webkit-tap-highlight-color: transparent;
@@ -122,9 +122,9 @@ select {
   text-transform: none;
 }
 button,
-input:where([type="button"]),
-input:where([type="reset"]),
-input:where([type="submit"]) {
+input:where([type='button']),
+input:where([type='reset']),
+input:where([type='submit']) {
   -webkit-appearance: button;
   background-color: transparent;
   background-image: none;
@@ -142,7 +142,7 @@ progress {
 ::-webkit-outer-spin-button {
   height: auto;
 }
-[type="search"] {
+[type='search'] {
   -webkit-appearance: textfield;
   outline-offset: -2px;
 }
@@ -202,7 +202,7 @@ textarea::placeholder {
   color: #9ca3af;
 }
 button,
-[role="button"] {
+[role='button'] {
   cursor: pointer;
 }
 :disabled {
@@ -224,24 +224,24 @@ video {
   max-width: 100%;
   height: auto;
 }
-[hidden]:where(:not([hidden="until-found"])) {
+[hidden]:where(:not([hidden='until-found'])) {
   display: none;
 }
 /* ========================================================================== */
 
 :root {
-  --color-bg: #F7F6F4;
-  --color-surface: #FFFFFF;
-  --color-surface-subtle: #FAFAFA;
-  --color-text: #18181B;
-  --color-text-muted: #A1A1AA;
-  --color-border: #E4E4E7;
-  --color-signal: #F7931A;
+  --color-bg: #f7f6f4;
+  --color-surface: #ffffff;
+  --color-surface-subtle: #fafafa;
+  --color-text: #18181b;
+  --color-text-muted: #a1a1aa;
+  --color-border: #e4e4e7;
+  --color-signal: #f7931a;
   --color-signal-low: rgba(247, 147, 26, 0.15);
-  --color-signal-mid: rgba(247, 147, 26, 0.70);
-  --color-severity-medium: #D97706;
+  --color-signal-mid: rgba(247, 147, 26, 0.7);
+  --color-severity-medium: #d97706;
   --color-severity-medium-low: rgba(217, 119, 6, 0.12);
-  --color-hover-row: #F4F3F1;
+  --color-hover-row: #f4f3f1;
 
   --border-hairline: 1px solid var(--color-border);
 
@@ -278,7 +278,9 @@ video {
   box-sizing: border-box;
 }
 
-html, body, #root {
+html,
+body,
+#root {
   height: 100%;
   margin: 0;
   padding: 0;
@@ -294,34 +296,65 @@ body {
 }
 
 @keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  25% { transform: translateX(4px); }
-  75% { transform: translateX(-4px); }
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(4px);
+  }
+  75% {
+    transform: translateX(-4px);
+  }
 }
 
 @keyframes signal-bleed {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes slide-up {
-  from { transform: translateY(100%); }
-  to { transform: translateY(0); }
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
 }
 
 @keyframes fade-in {
-  from { opacity: 0; transform: translateY(4px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes draw-edge {
-  from { stroke-dashoffset: 1; }
-  to { stroke-dashoffset: 0; }
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
 }
 
-.shake { animation: shake 150ms ease-out; }
-.slide-up { animation: slide-up 300ms ease-out; }
-.fade-in { animation: fade-in 200ms ease-out both; }
+.shake {
+  animation: shake 150ms ease-out;
+}
+.slide-up {
+  animation: slide-up 300ms ease-out;
+}
+.fade-in {
+  animation: fade-in 200ms ease-out both;
+}
 
 .label-micro {
   font-size: var(--text-xs);
@@ -338,20 +371,28 @@ body {
 
 /* Accordion animation */
 @keyframes accordion-down {
-  from { height: 0; }
-  to { height: var(--radix-accordion-content-height); }
+  from {
+    height: 0;
+  }
+  to {
+    height: var(--radix-accordion-content-height);
+  }
 }
 
 @keyframes accordion-up {
-  from { height: var(--radix-accordion-content-height); }
-  to { height: 0; }
+  from {
+    height: var(--radix-accordion-content-height);
+  }
+  to {
+    height: 0;
+  }
 }
 
-.accordion-content[data-state=open] {
+.accordion-content[data-state='open'] {
   animation: accordion-down 200ms ease-out;
 }
 
-.accordion-content[data-state=closed] {
+.accordion-content[data-state='closed'] {
   animation: accordion-up 200ms ease-out;
 }
 
@@ -359,6 +400,6 @@ body {
   transition: transform 200ms ease-out;
 }
 
-.accordion-trigger[data-state=open] .accordion-chevron {
+.accordion-trigger[data-state='open'] .accordion-chevron {
   transform: rotate(180deg);
 }

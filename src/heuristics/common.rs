@@ -25,7 +25,10 @@ pub fn not_detected() -> Value {
 // Reads a detector's "detected" field without the panic `Value`'s `[]` index
 // operator raises on a non-object.
 pub fn detected(result: &Value) -> bool {
-    result.get("detected").and_then(Value::as_bool).unwrap_or(false)
+    result
+        .get("detected")
+        .and_then(Value::as_bool)
+        .unwrap_or(false)
 }
 
 // The vout Bitcoin Core assigns to a coinbase input's (nonexistent) prevout.

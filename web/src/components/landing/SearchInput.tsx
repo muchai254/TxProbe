@@ -3,15 +3,22 @@ import type { KeyboardEvent } from 'react'
 import type { AppMode } from '../../lib/types'
 
 interface SearchInputProps {
-  mode: AppMode;
-  value: string;
-  error: string | null;
-  shaking: boolean;
-  onChange: (value: string) => void;
-  onKeyDown: (e: KeyboardEvent) => void;
+  mode: AppMode
+  value: string
+  error: string | null
+  shaking: boolean
+  onChange: (value: string) => void
+  onKeyDown: (e: KeyboardEvent) => void
 }
 
-export default function SearchInput({ mode, value, error, shaking, onChange, onKeyDown }: SearchInputProps) {
+export default function SearchInput({
+  mode,
+  value,
+  error,
+  shaking,
+  onChange,
+  onKeyDown,
+}: SearchInputProps) {
   return (
     <div
       className={shaking ? 'shake' : ''}
@@ -19,14 +26,24 @@ export default function SearchInput({ mode, value, error, shaking, onChange, onK
     >
       <Search
         size={16}
-        style={{ position: 'absolute', left: '14px', color: 'var(--color-text-muted)', pointerEvents: 'none', flexShrink: 0 }}
+        style={{
+          position: 'absolute',
+          left: '14px',
+          color: 'var(--color-text-muted)',
+          pointerEvents: 'none',
+          flexShrink: 0,
+        }}
       />
       <input
         type="text"
         value={value}
-        onChange={e => onChange(e.target.value)}
+        onChange={(e) => onChange(e.target.value)}
         onKeyDown={onKeyDown}
-        placeholder={mode === 'transaction' ? 'Paste a transaction ID' : 'Paste a Bitcoin address'}
+        placeholder={
+          mode === 'transaction'
+            ? 'Paste a transaction ID'
+            : 'Paste a Bitcoin address'
+        }
         style={{
           width: '100%',
           height: '52px',
@@ -40,8 +57,12 @@ export default function SearchInput({ mode, value, error, shaking, onChange, onK
           outline: 'none',
           transition: 'border-color var(--duration-fast)',
         }}
-        onFocus={e => { if (!error) e.target.style.borderColor = 'var(--color-text)' }}
-        onBlur={e => { if (!error) e.target.style.borderColor = 'var(--color-border)' }}
+        onFocus={(e) => {
+          if (!error) e.target.style.borderColor = 'var(--color-text)'
+        }}
+        onBlur={(e) => {
+          if (!error) e.target.style.borderColor = 'var(--color-border)'
+        }}
       />
     </div>
   )

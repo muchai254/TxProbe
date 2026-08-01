@@ -3,12 +3,12 @@ import { useState } from 'react'
 import { truncateId } from '../lib/format'
 
 interface HeaderProps {
-  onBack?: () => void;
-  backLabel?: string;
-  contextId?: string;
-  showCopy?: boolean;
-  showExternal?: boolean;
-  externalUrl?: string;
+  onBack?: () => void
+  backLabel?: string
+  contextId?: string
+  showCopy?: boolean
+  showExternal?: boolean
+  externalUrl?: string
 }
 
 export default function Header({
@@ -66,15 +66,31 @@ export default function Header({
       </div>
 
       {/* Center: wordmark + context */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
-        <Fingerprint size={15} style={{ color: 'var(--color-text)', flexShrink: 0 }} />
-        <span style={{ fontSize: 'var(--text-base)', fontWeight: 600, color: 'var(--color-text)' }}>
+      <div
+        style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}
+      >
+        <Fingerprint
+          size={15}
+          style={{ color: 'var(--color-text)', flexShrink: 0 }}
+        />
+        <span
+          style={{
+            fontSize: 'var(--text-base)',
+            fontWeight: 600,
+            color: 'var(--color-text)',
+          }}
+        >
           TxProbe
         </span>
         {contextId && (
           <>
             <span style={{ color: 'var(--color-text-muted)' }}>·</span>
-            <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-muted)' }}>
+            <span
+              style={{
+                fontSize: 'var(--text-sm)',
+                color: 'var(--color-text-muted)',
+              }}
+            >
               {truncateId(contextId)}
             </span>
           </>
@@ -82,7 +98,14 @@ export default function Header({
       </div>
 
       {/* Right: action buttons */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 'var(--space-1)' }}>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'flex-end',
+          gap: 'var(--space-1)',
+        }}
+      >
         {showCopy && contextId && (
           <button
             onClick={handleCopy}
@@ -97,7 +120,11 @@ export default function Header({
               alignItems: 'center',
             }}
           >
-            {copied ? <Check size={16} color="var(--color-signal)" /> : <Copy size={16} />}
+            {copied ? (
+              <Check size={16} color="var(--color-signal)" />
+            ) : (
+              <Copy size={16} />
+            )}
           </button>
         )}
         {showExternal && externalUrl && (

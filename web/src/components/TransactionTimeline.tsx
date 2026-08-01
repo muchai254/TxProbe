@@ -7,12 +7,12 @@ import { isLowScore } from '../lib/score'
 const TIMELINE_GRID_TEMPLATE_COLUMNS = '90px 1fr 100px auto'
 
 interface TransactionTimelineProps {
-  transactions: TxSummary[];
-  activeFilter: HeuristicId | null;
-  onFilterChange: (id: HeuristicId | null) => void;
-  onTxClick: (txid: string) => void;
-  visibleCount: number;
-  onLoadMore: () => void;
+  transactions: TxSummary[]
+  activeFilter: HeuristicId | null
+  onFilterChange: (id: HeuristicId | null) => void
+  onTxClick: (txid: string) => void
+  visibleCount: number
+  onLoadMore: () => void
 }
 
 export default function TransactionTimeline({
@@ -26,21 +26,30 @@ export default function TransactionTimeline({
   const visible = transactions.slice(0, visibleCount)
   const hasMore = transactions.length > visibleCount
 
-  const activeChips = HEURISTIC_IDS.filter(id =>
-    transactions.some(tx => tx.detected_heuristics.includes(id))
+  const activeChips = HEURISTIC_IDS.filter((id) =>
+    transactions.some((tx) => tx.detected_heuristics.includes(id)),
   )
 
   return (
-    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-      <div style={{
-        padding: 'var(--space-3) var(--space-6)',
-        borderBottom: 'var(--border-hairline)',
+    <div
+      style={{
+        flex: 1,
         display: 'flex',
-        gap: 'var(--space-2)',
-        flexWrap: 'wrap',
-        flexShrink: 0,
-      }}>
-        {activeChips.map(id => (
+        flexDirection: 'column',
+        overflow: 'hidden',
+      }}
+    >
+      <div
+        style={{
+          padding: 'var(--space-3) var(--space-6)',
+          borderBottom: 'var(--border-hairline)',
+          display: 'flex',
+          gap: 'var(--space-2)',
+          flexWrap: 'wrap',
+          flexShrink: 0,
+        }}
+      >
+        {activeChips.map((id) => (
           <button
             key={id}
             onClick={() => onFilterChange(activeFilter === id ? null : id)}
@@ -50,8 +59,12 @@ export default function TransactionTimeline({
               padding: '2px 8px',
               borderRadius: '3px',
               border: `1px solid ${activeFilter === id ? 'var(--color-text)' : 'var(--color-border)'}`,
-              backgroundColor: activeFilter === id ? 'var(--color-text)' : 'transparent',
-              color: activeFilter === id ? 'var(--color-surface)' : 'var(--color-text-muted)',
+              backgroundColor:
+                activeFilter === id ? 'var(--color-text)' : 'transparent',
+              color:
+                activeFilter === id
+                  ? 'var(--color-surface)'
+                  : 'var(--color-text-muted)',
               cursor: 'pointer',
               transition: 'all var(--duration-fast)',
             }}
@@ -61,18 +74,28 @@ export default function TransactionTimeline({
         ))}
       </div>
 
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: TIMELINE_GRID_TEMPLATE_COLUMNS,
-        gap: 'var(--space-4)',
-        padding: '0 var(--space-6)',
-        height: '36px',
-        alignItems: 'center',
-        borderBottom: 'var(--border-hairline)',
-        flexShrink: 0,
-      }}>
-        {['HEIGHT', 'TXID', 'SCORE', 'FLAGS'].map(h => (
-          <span key={h} style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-muted)', fontWeight: 600, letterSpacing: '0.06em' }}>
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: TIMELINE_GRID_TEMPLATE_COLUMNS,
+          gap: 'var(--space-4)',
+          padding: '0 var(--space-6)',
+          height: '36px',
+          alignItems: 'center',
+          borderBottom: 'var(--border-hairline)',
+          flexShrink: 0,
+        }}
+      >
+        {['HEIGHT', 'TXID', 'SCORE', 'FLAGS'].map((h) => (
+          <span
+            key={h}
+            style={{
+              fontSize: 'var(--text-xs)',
+              color: 'var(--color-text-muted)',
+              fontWeight: 600,
+              letterSpacing: '0.06em',
+            }}
+          >
             {h}
           </span>
         ))}
@@ -80,7 +103,9 @@ export default function TransactionTimeline({
 
       <div style={{ flex: 1, overflowY: 'auto' }}>
         {visible.map((tx, idx) => {
-          const isFiltered = activeFilter !== null && !tx.detected_heuristics.includes(activeFilter)
+          const isFiltered =
+            activeFilter !== null &&
+            !tx.detected_heuristics.includes(activeFilter)
           const truncId = truncateId(tx.txid)
           const scoreW = Math.round((tx.privacy_score / 100) * 80)
           const isLow = isLowScore(tx.privacy_score)
@@ -100,37 +125,79 @@ export default function TransactionTimeline({
                 borderBottom: 'var(--border-hairline)',
                 cursor: 'pointer',
                 opacity: isFiltered ? 0.3 : 1,
-                transition: 'opacity var(--duration-fast), background-color var(--duration-fast)',
+                transition:
+                  'opacity var(--duration-fast), background-color var(--duration-fast)',
                 animationDelay: `${idx * 20}ms`,
               }}
-              onMouseEnter={e => { e.currentTarget.style.backgroundColor = 'var(--color-hover-row)' }}
-              onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'transparent' }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = 'var(--color-hover-row)'
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent'
+              }}
             >
-              <span style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-muted)' }}>
+              <span
+                style={{
+                  fontSize: 'var(--text-xs)',
+                  color: 'var(--color-text-muted)',
+                }}
+              >
                 {tx.block_height > 0 ? tx.block_height.toLocaleString() : '—'}
               </span>
-              <span style={{ fontSize: 'var(--text-sm)' }}>
-                {truncId}
-              </span>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <span style={{ fontSize: 'var(--text-sm)' }}>{truncId}</span>
+              <div
+                style={{ display: 'flex', alignItems: 'center', gap: '4px' }}
+              >
                 <svg width="80" height="6" style={{ flexShrink: 0 }}>
-                  <rect x="0" y="0" width="80" height="6" rx="3" fill="var(--color-border)" />
-                  <rect x="0" y="0" width={scoreW} height="6" rx="3" fill={isLow ? 'var(--color-signal)' : 'var(--color-text)'} />
+                  <rect
+                    x="0"
+                    y="0"
+                    width="80"
+                    height="6"
+                    rx="3"
+                    fill="var(--color-border)"
+                  />
+                  <rect
+                    x="0"
+                    y="0"
+                    width={scoreW}
+                    height="6"
+                    rx="3"
+                    fill={isLow ? 'var(--color-signal)' : 'var(--color-text)'}
+                  />
                 </svg>
               </div>
-              <div style={{ display: 'flex', gap: '4px', alignItems: 'center', justifyContent: 'flex-end' }}>
-                {tx.detected_heuristics.slice(0, 3).map(h => (
-                  <span key={h} className="chip-signal" style={{
-                    fontSize: '9px',
-                    padding: '1px 4px',
-                    borderRadius: '2px',
-                    fontWeight: 700,
-                  }}>
+              <div
+                style={{
+                  display: 'flex',
+                  gap: '4px',
+                  alignItems: 'center',
+                  justifyContent: 'flex-end',
+                }}
+              >
+                {tx.detected_heuristics.slice(0, 3).map((h) => (
+                  <span
+                    key={h}
+                    className="chip-signal"
+                    style={{
+                      fontSize: '9px',
+                      padding: '1px 4px',
+                      borderRadius: '2px',
+                      fontWeight: 700,
+                    }}
+                  >
                     {getHeuristic(h).chip}
                   </span>
                 ))}
                 {tx.detected_heuristics.length === 0 && (
-                  <span style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-muted)' }}>—</span>
+                  <span
+                    style={{
+                      fontSize: 'var(--text-xs)',
+                      color: 'var(--color-text-muted)',
+                    }}
+                  >
+                    —
+                  </span>
                 )}
                 <ChevronRight size={14} color="var(--color-text-muted)" />
               </div>

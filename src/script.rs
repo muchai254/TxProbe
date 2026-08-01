@@ -92,18 +92,17 @@ pub fn read_push(script: &[u8], i: usize) -> Option<(&[u8], usize)> {
             if i + 3 > script.len() {
                 return None;
             }
-            (i + 3, u16::from_le_bytes([script[i + 1], script[i + 2]]) as usize)
+            (
+                i + 3,
+                u16::from_le_bytes([script[i + 1], script[i + 2]]) as usize,
+            )
         }
         0x4e => {
             if i + 5 > script.len() {
                 return None;
             }
-            let n = u32::from_le_bytes([
-                script[i + 1],
-                script[i + 2],
-                script[i + 3],
-                script[i + 4],
-            ]) as usize;
+            let n = u32::from_le_bytes([script[i + 1], script[i + 2], script[i + 3], script[i + 4]])
+                as usize;
             (i + 5, n)
         }
         _ => return None,
@@ -215,7 +214,10 @@ mod tests {
     #[test]
     fn classify_script_unknown() {
         assert_eq!(classify_script(&[]), ScriptType::Unknown);
-        assert_eq!(classify_script(&[0x51, 0x02, 0xab, 0xcd]), ScriptType::Unknown);
+        assert_eq!(
+            classify_script(&[0x51, 0x02, 0xab, 0xcd]),
+            ScriptType::Unknown
+        );
     }
 
     #[test]

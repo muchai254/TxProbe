@@ -175,9 +175,8 @@ mod tests {
 
     #[test]
     fn p2tr_matches_bech32m_vector() {
-        let xonly =
-            hex::decode("b6a9b333ceea3aa65c0229764cc9cedc16c8ea0b4786f9266d1fa37841f8e737")
-                .unwrap();
+        let xonly = hex::decode("b6a9b333ceea3aa65c0229764cc9cedc16c8ea0b4786f9266d1fa37841f8e737")
+            .unwrap();
         let mut script = vec![0x51, 0x20];
         script.extend_from_slice(&xonly);
         assert_eq!(

@@ -7,15 +7,23 @@ import HeuristicRow from './HeuristicRow'
 import PrivacyScoreRing from './PrivacyScoreRing'
 
 interface FindingsPanelProps {
-  score: number;
-  heuristics: Record<HeuristicId, HeuristicResult>;
-  detectedCount: number;
+  score: number
+  heuristics: Record<HeuristicId, HeuristicResult>
+  detectedCount: number
 }
 
-export default function FindingsPanel({ score, heuristics, detectedCount }: FindingsPanelProps) {
+export default function FindingsPanel({
+  score,
+  heuristics,
+  detectedCount,
+}: FindingsPanelProps) {
   const [expanded, setExpanded] = useState<HeuristicId | null>(null)
 
-  const severityCounts = HEURISTIC_LIST.reduce<{ high: number; medium: number; low: number }>(
+  const severityCounts = HEURISTIC_LIST.reduce<{
+    high: number
+    medium: number
+    low: number
+  }>(
     (acc, h) => {
       const r = heuristics[h.id]
       if (r?.detected) {
@@ -24,11 +32,15 @@ export default function FindingsPanel({ score, heuristics, detectedCount }: Find
       }
       return acc
     },
-    { high: 0, medium: 0, low: 0 }
+    { high: 0, medium: 0, low: 0 },
   )
 
   const severityLabel = (['high', 'medium', 'low'] as const)
-    .map(sev => severityCounts[sev] > 0 ? `${severityCounts[sev]} ${SEVERITY_SUMMARY_LABELS[sev]}` : '')
+    .map((sev) =>
+      severityCounts[sev] > 0
+        ? `${severityCounts[sev]} ${SEVERITY_SUMMARY_LABELS[sev]}`
+        : '',
+    )
     .filter(Boolean)
     .join(' · ')
 
@@ -46,14 +58,16 @@ export default function FindingsPanel({ score, heuristics, detectedCount }: Find
       }}
     >
       {/* Score summary */}
-      <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: 'var(--space-4)',
-        padding: '0 var(--space-6)',
-        height: '72px',
-        borderBottom: 'var(--border-hairline)',
-      }}>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 'var(--space-4)',
+          padding: '0 var(--space-6)',
+          height: '72px',
+          borderBottom: 'var(--border-hairline)',
+        }}
+      >
         <PrivacyScoreRing score={score} size={48} animate={true} />
         <div>
           <div className="label-micro" style={{ marginBottom: '2px' }}>
@@ -61,32 +75,50 @@ export default function FindingsPanel({ score, heuristics, detectedCount }: Find
           </div>
           <div style={{ fontSize: 'var(--text-md)', fontWeight: 600 }}>
             {score}
-            <span style={{ color: 'var(--color-text-muted)', fontWeight: 400 }}> / 100</span>
-            <span style={{ fontSize: 'var(--text-xs)', color: isClean ? 'var(--color-text-muted)' : 'var(--color-signal)', fontWeight: 400 }}>
-              {' '}· {getScoreLabel(score)}
+            <span style={{ color: 'var(--color-text-muted)', fontWeight: 400 }}>
+              {' '}
+              / 100
+            </span>
+            <span
+              style={{
+                fontSize: 'var(--text-xs)',
+                color: isClean
+                  ? 'var(--color-text-muted)'
+                  : 'var(--color-signal)',
+                fontWeight: 400,
+              }}
+            >
+              {' '}
+              · {getScoreLabel(score)}
             </span>
           </div>
-          <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-muted)' }}>
+          <div
+            style={{
+              fontSize: 'var(--text-sm)',
+              color: 'var(--color-text-muted)',
+            }}
+          >
             {detectedCount === 0
               ? 'No privacy issues detected'
-              : `${detectedCount} issue${detectedCount !== 1 ? 's' : ''} detected${severityLabel ? ` · ${severityLabel}` : ''}`
-            }
+              : `${detectedCount} issue${detectedCount !== 1 ? 's' : ''} detected${severityLabel ? ` · ${severityLabel}` : ''}`}
           </div>
         </div>
       </div>
 
       {/* Severity legend */}
-      <div style={{
-        padding: 'var(--space-2) var(--space-6)',
-        borderBottom: 'var(--border-hairline)',
-        fontSize: 'var(--text-xs)',
-        color: 'var(--color-text-muted)',
-        fontStyle: 'italic',
-      }}>
+      <div
+        style={{
+          padding: 'var(--space-2) var(--space-6)',
+          borderBottom: 'var(--border-hairline)',
+          fontSize: 'var(--text-xs)',
+          color: 'var(--color-text-muted)',
+          fontStyle: 'italic',
+        }}
+      >
         Severity reflects how much an observer learns from each flagged pattern.
       </div>
 
-      {HEURISTIC_LIST.map(h => (
+      {HEURISTIC_LIST.map((h) => (
         <HeuristicRow
           key={h.id}
           id={h.id}

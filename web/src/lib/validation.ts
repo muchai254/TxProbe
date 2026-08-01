@@ -3,7 +3,8 @@
 // and the Node server — so keep both in sync by hand if the rule ever changes.
 export function validateTxid(s: string): string | null {
   if (!s.trim()) return 'Please enter a transaction ID.'
-  if (!/^[0-9a-fA-F]{64}$/.test(s.trim())) return 'Transaction ID must be 64 hex characters.'
+  if (!/^[0-9a-fA-F]{64}$/.test(s.trim()))
+    return 'Transaction ID must be 64 hex characters.'
   return null
 }
 

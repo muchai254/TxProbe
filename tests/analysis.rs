@@ -21,8 +21,8 @@ fn run_fixture(name: &str) -> Value {
     let fixture_path = format!("tests/fixtures/{name}.json");
     let raw = fs::read_to_string(&fixture_path)
         .unwrap_or_else(|e| panic!("failed to read {fixture_path}: {e}"));
-    let fixture: Fixture =
-        serde_json::from_str(&raw).unwrap_or_else(|e| panic!("failed to parse {fixture_path}: {e}"));
+    let fixture: Fixture = serde_json::from_str(&raw)
+        .unwrap_or_else(|e| panic!("failed to parse {fixture_path}: {e}"));
 
     let raw_bytes = hex::decode(&fixture.raw_tx).expect("fixture raw_tx must be valid hex");
     let tx = parse_transaction(&raw_bytes).expect("fixture raw_tx must parse");
@@ -41,7 +41,10 @@ fn golden(name: &str) -> Value {
 fn assert_matches_golden(name: &str) {
     let actual = run_fixture(name);
     let expected = golden(name);
-    assert_eq!(actual, expected, "analyzer output drifted from golden fixture: {name}");
+    assert_eq!(
+        actual, expected,
+        "analyzer output drifted from golden fixture: {name}"
+    );
 }
 
 // One test per fixture (rather than a loop over the directory) so a

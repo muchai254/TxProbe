@@ -1,6 +1,10 @@
 import { useEffect, useReducer } from 'react'
 import { analyzeTx } from '../lib/api'
-import type { TxAnalysis as TxAnalysisData, HeuristicId, NavSource } from '../lib/types'
+import type {
+  TxAnalysis as TxAnalysisData,
+  HeuristicId,
+  NavSource,
+} from '../lib/types'
 import { HEURISTIC_IDS } from '../lib/heuristics'
 import Header from './Header'
 import TxGraph from './TxGraph'
@@ -10,29 +14,37 @@ import PageShell from './ui/PageShell'
 import SecondaryButton from './ui/SecondaryButton'
 
 interface Props {
-  txid: string;
-  source: NavSource;
-  onBack: () => void;
+  txid: string
+  source: NavSource
+  onBack: () => void
 }
 
 type State =
   | { status: 'fetching' }
   | { status: 'analyzing' }
   | { status: 'success'; data: TxAnalysisData; blockHeight: number | null }
-  | { status: 'error'; message: string };
+  | { status: 'error'; message: string }
 
 type Action =
   | { type: 'fetching' }
   | { type: 'analyzing' }
   | { type: 'success'; data: TxAnalysisData; blockHeight: number | null }
-  | { type: 'error'; message: string };
+  | { type: 'error'; message: string }
 
 function reducer(_: State, action: Action): State {
   switch (action.type) {
-    case 'fetching': return { status: 'fetching' }
-    case 'analyzing': return { status: 'analyzing' }
-    case 'success': return { status: 'success', data: action.data, blockHeight: action.blockHeight }
-    case 'error': return { status: 'error', message: action.message }
+    case 'fetching':
+      return { status: 'fetching' }
+    case 'analyzing':
+      return { status: 'analyzing' }
+    case 'success':
+      return {
+        status: 'success',
+        data: action.data,
+        blockHeight: action.blockHeight,
+      }
+    case 'error':
+      return { status: 'error', message: action.message }
   }
 }
 
@@ -42,33 +54,63 @@ export default function TxAnalysis({ txid, source, onBack }: Props) {
   useEffect(() => {
     let cancelled = false
     dispatch({ type: 'fetching' })
-    const t = setTimeout(() => { if (!cancelled) dispatch({ type: 'analyzing' }) }, 600)
+    const t = setTimeout(() => {
+      if (!cancelled) dispatch({ type: 'analyzing' })
+    }, 600)
 
     analyzeTx(txid)
-      .then(res => {
+      .then((res) => {
         clearTimeout(t)
         if (cancelled) return
-        dispatch({ type: 'success', data: res.analysis, blockHeight: res.mempool.block_height })
+        dispatch({
+          type: 'success',
+          data: res.analysis,
+          blockHeight: res.mempool.block_height,
+        })
       })
-      .catch(err => {
+      .catch((err) => {
         clearTimeout(t)
         if (cancelled) return
         dispatch({ type: 'error', message: (err as Error).message })
       })
 
-    return () => { cancelled = true; clearTimeout(t) }
+    return () => {
+      cancelled = true
+      clearTimeout(t)
+    }
   }, [txid])
 
   const backLabel = source === 'address' ? 'Address' : undefined
 
   if (state.status === 'error') {
     return (
-      <PageShell header={<Header onBack={onBack} backLabel={backLabel} contextId={txid} />}>
-        <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 'var(--space-4)' }}>
-          <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text-muted)', margin: 0 }}>
+      <PageShell
+        header={
+          <Header onBack={onBack} backLabel={backLabel} contextId={txid} />
+        }
+      >
+        <div
+          style={{
+            flex: 1,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexDirection: 'column',
+            gap: 'var(--space-4)',
+          }}
+        >
+          <p
+            style={{
+              fontSize: 'var(--text-base)',
+              color: 'var(--color-text-muted)',
+              margin: 0,
+            }}
+          >
             {state.message}
           </p>
-          <SecondaryButton onClick={() => window.location.reload()}>Retry</SecondaryButton>
+          <SecondaryButton onClick={() => window.location.reload()}>
+            Retry
+          </SecondaryButton>
         </div>
       </PageShell>
     )
@@ -76,7 +118,7 @@ export default function TxAnalysis({ txid, source, onBack }: Props) {
 
   const data = state.status === 'success' ? state.data : null
   const detectedHeuristics: HeuristicId[] = data
-    ? HEURISTIC_IDS.filter(id => data.heuristics[id]?.detected)
+    ? HEURISTIC_IDS.filter((id) => data.heuristics[id]?.detected)
     : []
 
   return (
@@ -92,9 +134,19 @@ export default function TxAnalysis({ txid, source, onBack }: Props) {
         />
       }
     >
-      <div style={{ flex: 1, overflow: 'auto', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div
+        style={{
+          flex: 1,
+          overflow: 'auto',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
         {(state.status === 'fetching' || state.status === 'analyzing') && (
-          <TxLoadingState phase={state.status === 'fetching' ? 'fetching' : 'analyzing'} />
+          <TxLoadingState
+            phase={state.status === 'fetching' ? 'fetching' : 'analyzing'}
+          />
         )}
         {data && (
           <TxGraph

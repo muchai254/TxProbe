@@ -12,13 +12,13 @@ import Header from './Header'
 import TextType from './TextType'
 
 interface LandingProps {
-  onTxSubmit: (txid: string) => void;
-  onAddressSubmit: (address: string) => void;
+  onTxSubmit: (txid: string) => void
+  onAddressSubmit: (address: string) => void
 }
 
 interface Samples {
-  txids: string[];
-  addresses: string[];
+  txids: string[]
+  addresses: string[]
 }
 
 export default function Landing({ onTxSubmit, onAddressSubmit }: LandingProps) {
@@ -32,7 +32,10 @@ export default function Landing({ onTxSubmit, onAddressSubmit }: LandingProps) {
   useEffect(() => {
     setSamplesLoading(true)
     fetchSamples()
-      .then(s => { setSamples(s); setSamplesLoading(false) })
+      .then((s) => {
+        setSamples(s)
+        setSamplesLoading(false)
+      })
       .catch(() => setSamplesLoading(false))
   }, [])
 
@@ -44,7 +47,8 @@ export default function Landing({ onTxSubmit, onAddressSubmit }: LandingProps) {
 
   function submit(v: string) {
     const trimmed = v.trim()
-    const err = mode === 'transaction' ? validateTxid(trimmed) : validateAddress(trimmed)
+    const err =
+      mode === 'transaction' ? validateTxid(trimmed) : validateAddress(trimmed)
     if (err) {
       setError(err)
       setShaking(true)
@@ -77,25 +81,37 @@ export default function Landing({ onTxSubmit, onAddressSubmit }: LandingProps) {
     submit(s)
   }
 
-  const currentSamples = mode === 'transaction' ? samples?.txids : samples?.addresses
+  const currentSamples =
+    mode === 'transaction' ? samples?.txids : samples?.addresses
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: 'var(--color-bg)' }}>
-      <Header />
-
-      <div style={{
-        flex: 1,
+    <div
+      style={{
+        minHeight: '100vh',
         display: 'flex',
         flexDirection: 'column',
-      }}>
-        {/* TextType hero — top 40% of body */}
-        <div style={{
-          height: '40vh',
+        backgroundColor: 'var(--color-bg)',
+      }}
+    >
+      <Header />
+
+      <div
+        style={{
+          flex: 1,
           display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          padding: '0 var(--space-8)',
-        }}>
+          flexDirection: 'column',
+        }}
+      >
+        {/* TextType hero — top 40% of body */}
+        <div
+          style={{
+            height: '40vh',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '0 var(--space-8)',
+          }}
+        >
           <TextType
             text={TYPING_SENTENCES}
             typingSpeed={65}
@@ -115,97 +131,119 @@ export default function Landing({ onTxSubmit, onAddressSubmit }: LandingProps) {
         </div>
 
         {/* Form — remaining 60% of body, centered */}
-        <div style={{
-          flex: 1,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          padding: 'var(--space-8)',
-        }}>
-        <div style={{ width: '100%', maxWidth: '560px' }}>
-          {/* Mode tabs */}
-          <div style={{
+        <div
+          style={{
+            flex: 1,
             display: 'flex',
-            gap: 'var(--space-6)',
-            marginBottom: 'var(--space-6)',
+            alignItems: 'center',
             justifyContent: 'center',
-          }}>
-            {(['transaction', 'address'] as AppMode[]).map(m => (
-              <button
-                key={m}
-                onClick={() => switchMode(m)}
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  borderBottom: mode === m ? '1px solid var(--color-text)' : '1px solid transparent',
-                  padding: '4px 0 6px 0',
-                  cursor: 'pointer',
-                  fontSize: 'var(--text-sm)',
-                  color: mode === m ? 'var(--color-text)' : 'var(--color-text-muted)',
-                  fontWeight: mode === m ? 600 : 400,
-                  textTransform: 'capitalize',
-                  transition: 'color var(--duration-fast)',
-                }}
-              >
-                {m}
-              </button>
-            ))}
-          </div>
-
-          <SearchInput
-            mode={mode}
-            value={value}
-            error={error}
-            shaking={shaking}
-            onChange={handleValueChange}
-            onKeyDown={handleKeyDown}
-          />
-
-          <SampleChips
-            loading={samplesLoading}
-            samples={currentSamples}
-            onSampleClick={handleSampleClick}
-          />
-
-          {/* Validation error */}
-          {error && (
-            <p style={{ margin: 'var(--space-2) 0 0', fontSize: 'var(--text-xs)', color: 'var(--color-signal)' }}>
-              {error}
-            </p>
-          )}
-
-          {/* Submit button */}
-          <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 'var(--space-4)' }}>
-            <button
-              onClick={handleSubmit}
+            padding: 'var(--space-8)',
+          }}
+        >
+          <div style={{ width: '100%', maxWidth: '560px' }}>
+            {/* Mode tabs */}
+            <div
               style={{
                 display: 'flex',
-                alignItems: 'center',
-                gap: 'var(--space-2)',
-                padding: '8px 16px',
-                fontSize: 'var(--text-sm)',
-                border: '1px solid var(--color-text)',
-                borderRadius: 'var(--radius-sm)',
-                backgroundColor: 'transparent',
-                color: 'var(--color-text)',
-                cursor: 'pointer',
-                fontWeight: 500,
-                transition: 'all var(--duration-fast)',
-              }}
-              onMouseEnter={e => {
-                e.currentTarget.style.backgroundColor = 'var(--color-text)'
-                e.currentTarget.style.color = 'var(--color-surface)'
-              }}
-              onMouseLeave={e => {
-                e.currentTarget.style.backgroundColor = 'transparent'
-                e.currentTarget.style.color = 'var(--color-text)'
+                gap: 'var(--space-6)',
+                marginBottom: 'var(--space-6)',
+                justifyContent: 'center',
               }}
             >
-              Analyze
-              <ArrowRight size={14} />
-            </button>
+              {(['transaction', 'address'] as AppMode[]).map((m) => (
+                <button
+                  key={m}
+                  onClick={() => switchMode(m)}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    borderBottom:
+                      mode === m
+                        ? '1px solid var(--color-text)'
+                        : '1px solid transparent',
+                    padding: '4px 0 6px 0',
+                    cursor: 'pointer',
+                    fontSize: 'var(--text-sm)',
+                    color:
+                      mode === m
+                        ? 'var(--color-text)'
+                        : 'var(--color-text-muted)',
+                    fontWeight: mode === m ? 600 : 400,
+                    textTransform: 'capitalize',
+                    transition: 'color var(--duration-fast)',
+                  }}
+                >
+                  {m}
+                </button>
+              ))}
+            </div>
+
+            <SearchInput
+              mode={mode}
+              value={value}
+              error={error}
+              shaking={shaking}
+              onChange={handleValueChange}
+              onKeyDown={handleKeyDown}
+            />
+
+            <SampleChips
+              loading={samplesLoading}
+              samples={currentSamples}
+              onSampleClick={handleSampleClick}
+            />
+
+            {/* Validation error */}
+            {error && (
+              <p
+                style={{
+                  margin: 'var(--space-2) 0 0',
+                  fontSize: 'var(--text-xs)',
+                  color: 'var(--color-signal)',
+                }}
+              >
+                {error}
+              </p>
+            )}
+
+            {/* Submit button */}
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'flex-end',
+                marginTop: 'var(--space-4)',
+              }}
+            >
+              <button
+                onClick={handleSubmit}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 'var(--space-2)',
+                  padding: '8px 16px',
+                  fontSize: 'var(--text-sm)',
+                  border: '1px solid var(--color-text)',
+                  borderRadius: 'var(--radius-sm)',
+                  backgroundColor: 'transparent',
+                  color: 'var(--color-text)',
+                  cursor: 'pointer',
+                  fontWeight: 500,
+                  transition: 'all var(--duration-fast)',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = 'var(--color-text)'
+                  e.currentTarget.style.color = 'var(--color-surface)'
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'transparent'
+                  e.currentTarget.style.color = 'var(--color-text)'
+                }}
+              >
+                Analyze
+                <ArrowRight size={14} />
+              </button>
+            </div>
           </div>
-        </div>
         </div>
       </div>
 

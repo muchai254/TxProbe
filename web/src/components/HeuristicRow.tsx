@@ -5,10 +5,10 @@ import { getHeuristic } from '../lib/heuristics'
 import { SEVERITY_COLORS, SEVERITY_LABELS } from '../lib/severity'
 
 interface HeuristicRowProps {
-  id: HeuristicId;
-  result: HeuristicResult;
-  expanded: boolean;
-  onToggle: () => void;
+  id: HeuristicId
+  result: HeuristicResult
+  expanded: boolean
+  onToggle: () => void
 }
 
 function truncateTeaser(text: string, max = 68): string {
@@ -16,7 +16,12 @@ function truncateTeaser(text: string, max = 68): string {
   return text.slice(0, max).replace(/\s+\S*$/, '') + '…'
 }
 
-export default function HeuristicRow({ id, result, expanded, onToggle }: HeuristicRowProps) {
+export default function HeuristicRow({
+  id,
+  result,
+  expanded,
+  onToggle,
+}: HeuristicRowProps) {
   const meta = getHeuristic(id)
   const detailRef = useRef<HTMLDivElement>(null)
   const [height, setHeight] = useState(0)
@@ -38,7 +43,9 @@ export default function HeuristicRow({ id, result, expanded, onToggle }: Heurist
           display: 'flex',
           alignItems: isDetected ? 'flex-start' : 'center',
           gap: 'var(--space-3)',
-          padding: isDetected ? 'var(--space-3) var(--space-6)' : '0 var(--space-6)',
+          padding: isDetected
+            ? 'var(--space-3) var(--space-6)'
+            : '0 var(--space-6)',
           minHeight: '48px',
           background: 'none',
           border: 'none',
@@ -68,21 +75,27 @@ export default function HeuristicRow({ id, result, expanded, onToggle }: Heurist
 
         {/* Name + teaser */}
         <div style={{ flex: 1 }}>
-          <div style={{
-            fontSize: 'var(--text-sm)',
-            color: isDetected ? 'var(--color-text)' : 'var(--color-text-muted)',
-            fontWeight: isDetected ? 500 : 400,
-            lineHeight: 1.4,
-          }}>
+          <div
+            style={{
+              fontSize: 'var(--text-sm)',
+              color: isDetected
+                ? 'var(--color-text)'
+                : 'var(--color-text-muted)',
+              fontWeight: isDetected ? 500 : 400,
+              lineHeight: 1.4,
+            }}
+          >
             {meta.name}
           </div>
           {isDetected && (
-            <div style={{
-              fontSize: 'var(--text-xs)',
-              color: 'var(--color-text-muted)',
-              marginTop: '3px',
-              lineHeight: 1.4,
-            }}>
+            <div
+              style={{
+                fontSize: 'var(--text-xs)',
+                color: 'var(--color-text-muted)',
+                marginTop: '3px',
+                lineHeight: 1.4,
+              }}
+            >
               {truncateTeaser(meta.observerLearns)}
             </div>
           )}
@@ -90,26 +103,42 @@ export default function HeuristicRow({ id, result, expanded, onToggle }: Heurist
 
         {/* Severity badge */}
         {isDetected ? (
-          <span style={{
-            fontSize: 'var(--text-xs)',
-            padding: '2px 8px',
-            borderRadius: '3px',
-            backgroundColor: colors.bg,
-            color: colors.text,
-            fontWeight: 600,
-            letterSpacing: '0.03em',
-            flexShrink: 0,
-            marginTop: '1px',
-          }}>
+          <span
+            style={{
+              fontSize: 'var(--text-xs)',
+              padding: '2px 8px',
+              borderRadius: '3px',
+              backgroundColor: colors.bg,
+              color: colors.text,
+              fontWeight: 600,
+              letterSpacing: '0.03em',
+              flexShrink: 0,
+              marginTop: '1px',
+            }}
+          >
             {SEVERITY_LABELS[meta.severity]}
           </span>
         ) : (
-          <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-muted)', flexShrink: 0 }}>—</span>
+          <span
+            style={{
+              fontSize: 'var(--text-sm)',
+              color: 'var(--color-text-muted)',
+              flexShrink: 0,
+            }}
+          >
+            —
+          </span>
         )}
 
         {/* Chevron */}
         {isDetected && (
-          <span style={{ color: 'var(--color-text-muted)', flexShrink: 0, marginTop: '2px' }}>
+          <span
+            style={{
+              color: 'var(--color-text-muted)',
+              flexShrink: 0,
+              marginTop: '2px',
+            }}
+          >
             {expanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
           </span>
         )}
@@ -124,15 +153,20 @@ export default function HeuristicRow({ id, result, expanded, onToggle }: Heurist
           }}
         >
           <div ref={detailRef}>
-            <div style={{
-              padding: 'var(--space-4) var(--space-6) var(--space-6)',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 'var(--space-4)',
-              backgroundColor: 'var(--color-surface-subtle)',
-            }}>
+            <div
+              style={{
+                padding: 'var(--space-4) var(--space-6) var(--space-6)',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 'var(--space-4)',
+                backgroundColor: 'var(--color-surface-subtle)',
+              }}
+            >
               <Section label="What was detected" text={meta.detected} />
-              <Section label="What an observer learns" text={meta.observerLearns} />
+              <Section
+                label="What an observer learns"
+                text={meta.observerLearns}
+              />
               <Section label="Next time" text={meta.nextTime} />
             </div>
           </div>
@@ -148,7 +182,14 @@ function Section({ label, text }: { label: string; text: string }) {
       <p className="label-micro" style={{ margin: '0 0 4px', fontWeight: 600 }}>
         {label}
       </p>
-      <p style={{ margin: 0, fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.6 }}>
+      <p
+        style={{
+          margin: 0,
+          fontSize: 'var(--text-sm)',
+          color: 'var(--color-text)',
+          lineHeight: 1.6,
+        }}
+      >
         {text}
       </p>
     </div>

@@ -127,12 +127,8 @@ pub fn run_heuristics(ctx: &TxContext) -> HeuristicResults {
         ctx.spendable_out_count,
     );
 
-    let input_script_types: Vec<ScriptType> = ctx
-        .tx
-        .inputs
-        .iter()
-        .map(infer_input_script_type)
-        .collect();
+    let input_script_types: Vec<ScriptType> =
+        ctx.tx.inputs.iter().map(infer_input_script_type).collect();
 
     let has_mixed_inputs = if input_script_types.len() > 1 {
         let first = input_script_types[0];

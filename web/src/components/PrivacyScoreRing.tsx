@@ -2,12 +2,16 @@ import { useEffect, useRef } from 'react'
 import { getScoreLabel, isCleanScore } from '../lib/score'
 
 interface PrivacyScoreRingProps {
-  score: number;
-  size?: number;
-  animate?: boolean;
+  score: number
+  size?: number
+  animate?: boolean
 }
 
-export default function PrivacyScoreRing({ score, size = 80, animate = true }: PrivacyScoreRingProps) {
+export default function PrivacyScoreRing({
+  score,
+  size = 80,
+  animate = true,
+}: PrivacyScoreRingProps) {
   const circleRef = useRef<SVGCircleElement>(null)
   const radius = (size - 8) / 2
   const circumference = 2 * Math.PI * radius
@@ -30,7 +34,9 @@ export default function PrivacyScoreRing({ score, size = 80, animate = true }: P
   }, [score, animate, circumference, offset])
 
   return (
-    <div style={{ position: 'relative', width: size, height: size, flexShrink: 0 }}>
+    <div
+      style={{ position: 'relative', width: size, height: size, flexShrink: 0 }}
+    >
       <svg width={size} height={size}>
         <circle
           cx={size / 2}
@@ -55,29 +61,37 @@ export default function PrivacyScoreRing({ score, size = 80, animate = true }: P
           style={{ transition: animate ? 'none' : undefined }}
         />
       </svg>
-      <div style={{
-        position: 'absolute',
-        inset: 0,
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: '2px',
-      }}>
-        <span style={{
-          fontSize: size >= 64 ? 'var(--text-xl)' : 'var(--text-md)',
-          fontWeight: 600,
-          color: isClean ? 'var(--color-text)' : 'var(--color-signal)',
-          lineHeight: 1,
-        }}>
+      <div
+        style={{
+          position: 'absolute',
+          inset: 0,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: '2px',
+        }}
+      >
+        <span
+          style={{
+            fontSize: size >= 64 ? 'var(--text-xl)' : 'var(--text-md)',
+            fontWeight: 600,
+            color: isClean ? 'var(--color-text)' : 'var(--color-signal)',
+            lineHeight: 1,
+          }}
+        >
           {score}
         </span>
         {showLabel && (
-          <span style={{
-            fontSize: '9px',
-            color: isClean ? 'var(--color-text-muted)' : 'var(--color-signal)',
-            lineHeight: 1,
-          }}>
+          <span
+            style={{
+              fontSize: '9px',
+              color: isClean
+                ? 'var(--color-text-muted)'
+                : 'var(--color-signal)',
+              lineHeight: 1,
+            }}
+          >
             {getScoreLabel(score)}
           </span>
         )}
