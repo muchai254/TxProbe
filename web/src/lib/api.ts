@@ -23,6 +23,8 @@ export async function fetchSamples(): Promise<{ txids: string[]; addresses: stri
 // Fetch tx history for a Bitcoin address directly from blockstream.info (CORS-enabled).
 // Returns lightweight summaries; privacy_score and detected_heuristics are initially empty
 // and are populated lazily by AddressAnalysis as each tx is analyzed.
+// Base URL duplicated from server/upstream.js's BLOCKSTREAM_API — this bypasses the
+// server entirely, so the two copies must be kept in sync by hand.
 export async function fetchAddressTxs(address: string): Promise<TxSummary[]> {
   const res = await fetch(`https://blockstream.info/api/address/${address}/txs`);
   if (!res.ok) {
