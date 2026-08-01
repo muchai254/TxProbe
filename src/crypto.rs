@@ -17,14 +17,3 @@ pub fn hex_rev(bytes: &[u8]) -> String {
     v.reverse();
     hex::encode(v)
 }
-
-// Decrypts `data` in-place using a cyclically repeating `key`.
-
-pub fn apply_xor(data: &mut [u8], key: &[u8]) {
-    if key.is_empty() || key.iter().all(|&b| b == 0) {
-        return;
-    }
-    for i in 0..data.len() {
-        data[i] ^= key[i % key.len()];
-    }
-}

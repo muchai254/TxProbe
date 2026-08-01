@@ -61,7 +61,6 @@ pub fn analyze_single_tx(tx: &ParsedTx, prevouts: &[PrevoutEntry]) -> Value {
             })
             .collect(),
         txid: tx.txid,
-        wtxid: tx.wtxid,
         base_size: tx.base_size,
         witness_size: tx.witness_size,
         input_values: input_values.clone(),

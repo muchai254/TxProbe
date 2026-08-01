@@ -27,8 +27,6 @@ pub struct ParsedTx {
 
     pub txid: [u8; 32],
 
-    pub wtxid: [u8; 32],
-
     pub base_size: usize,
     pub witness_size: usize,
 
@@ -139,9 +137,8 @@ pub fn parse_transaction(raw: &[u8]) -> Result<ParsedTx, Box<dyn std::error::Err
     legacy_bytes.extend_from_slice(&lt_buf);
     let locktime = u32::from_le_bytes(lt_buf);
 
-    // txid = dSHA256(legacy serialization); wtxid = dSHA256(full raw bytes).
+    // txid = dSHA256(legacy serialization).
     let txid = dsha256(&legacy_bytes);
-    let wtxid = dsha256(raw);
     let base_size = legacy_bytes.len();
 
     Ok(ParsedTx {
@@ -151,7 +148,6 @@ pub fn parse_transaction(raw: &[u8]) -> Result<ParsedTx, Box<dyn std::error::Err
         inputs,
         outputs,
         txid,
-        wtxid,
         base_size,
         witness_size,
         input_values: Vec::new(),
@@ -164,7 +160,7 @@ mod tests {
     use super::*;
 
     // Vectors are hand-built minimal 1-in/1-out transactions with expected
-    // txid/wtxid/base_size/witness_size computed independently in Python
+    // txid/base_size/witness_size computed independently in Python
     // (dsha256 over the same byte layout), not derived from this parser.
 
     #[test]
@@ -190,8 +186,6 @@ mod tests {
             hex::encode(tx.txid),
             "e8fcaa0cb5fd8cc2aec29807f36447c3d45a5d33d63b32a812429095b1a766fa"
         );
-        // Non-segwit: wtxid is dsha256 of the same bytes as txid.
-        assert_eq!(tx.txid, tx.wtxid);
     }
 
     #[test]
@@ -215,11 +209,5 @@ mod tests {
             hex::encode(tx.txid),
             "9807013bc205602fc829ab582a1c3d09d87babcc246b58a8e4235827a9f25172"
         );
-        assert_eq!(
-            hex::encode(tx.wtxid),
-            "803c6a5c5c2bb493628978284d78b625128cd04b1a937cc1b698aaaf4eaa5dbc"
-        );
-        // Segwit: txid (legacy hash) and wtxid (full hash) must differ.
-        assert_ne!(tx.txid, tx.wtxid);
     }
 }
