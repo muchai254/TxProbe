@@ -1,78 +1,20 @@
 import { useState, useEffect } from 'react'
-import { Search, ArrowRight, Fingerprint } from 'lucide-react'
+import { ArrowRight } from 'lucide-react'
 import type { AppMode } from '../lib/types'
 import { fetchSamples } from '../lib/api'
-import { truncateId } from '../lib/format'
+import { validateTxid, validateAddress } from '../lib/validation'
+import { TYPING_SENTENCES, TYPING_COLORS } from './landing/content'
+import SearchInput from './landing/SearchInput'
+import SampleChips from './landing/SampleChips'
+import FaqSection from './landing/FaqSection'
+import LandingFooter from './landing/LandingFooter'
+import Header from './Header'
 // @ts-ignore — JSX component, no type declarations needed
 import TextType from './TextType'
-import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from './ui/Accordion'
-
-const FAQ_ITEMS = [
-  {
-    q: 'What is a privacy score?',
-    a: 'A 0–100 score measuring how much an observer can learn from a Bitcoin transaction or address history. 100 means an observer learns nothing useful. 0 means your full transaction graph is visible. Most real-world transactions score between 40 and 90.',
-  },
-  {
-    q: 'Is it safe to enter my transaction ID or Bitcoin address?',
-    a: 'Yes. Transaction IDs and Bitcoin addresses are already public on the blockchain — anyone can look them up. TxProbe does not ask for private keys, seed phrases, or any sensitive information. Nothing you enter here is stored.',
-  },
-  {
-    q: 'What is a chain analysis heuristic?',
-    a: 'A heuristic is a pattern that blockchain analysts use to make inferences about who controls which coins. TxProbe applies the same 14 techniques used by professional analytics firms, so you can see exactly what they see.',
-  },
-  {
-    q: 'Why does address reuse damage my privacy?',
-    a: 'Every time you reuse a Bitcoin address, you link two or more transactions together. Over time this collapses your privacy across your entire history — anyone watching the blockchain can connect the dots. Use a fresh address for every payment.',
-  },
-  {
-    q: "What's the difference between analyzing a transaction and an address?",
-    a: 'A transaction analysis examines a single event: what was sent, to whom, and what patterns are visible. An address analysis reviews your full transaction history, showing how privacy issues compound over time and which transaction was your worst privacy leak.',
-  },
-  {
-    q: 'How can I improve my Bitcoin privacy?',
-    a: 'Use a fresh receive address for every transaction. Avoid consolidating many small UTXOs in a single transaction. Consider CoinJoin protocols (Whirlpool, JoinMarket) for high-value amounts. Use the Lightning Network for small everyday payments. Avoid round-number payment amounts.',
-  },
-  {
-    q: 'Does TxProbe store my data or track me?',
-    a: 'No. Transaction IDs and addresses are public blockchain data — TxProbe fetches them from the public Bitcoin network the same way any block explorer does. Analysis results are cached briefly for performance and discarded. No user accounts, no logs, no tracking.',
-  },
-]
-
-const TYPING_SENTENCES = [
-  'Every Bitcoin transaction leaves clues.',
-  'Inputs reveal patterns.',
-  'Outputs reveal behaviour.',
-  'Change reveals identity.',
-  'Patterns reveal privacy leaks.',
-  'Investigate your Bitcoin footprint.',
-]
-
-const TYPING_COLORS = [
-  'var(--color-text-muted)',
-  'var(--color-text-muted)',
-  'var(--color-text-muted)',
-  'var(--color-text-muted)',
-  'var(--color-text-muted)',
-  'var(--color-text)',
-]
 
 interface LandingProps {
   onTxSubmit: (txid: string) => void;
   onAddressSubmit: (address: string) => void;
-}
-
-function validateTxid(s: string): string | null {
-  if (!s.trim()) return 'Please enter a transaction ID.'
-  if (!/^[0-9a-fA-F]{64}$/.test(s.trim())) return 'Transaction ID must be 64 hex characters.'
-  return null
-}
-
-function validateAddress(s: string): string | null {
-  if (!s.trim()) return 'Please enter a Bitcoin address.'
-  if (!/^(1|3|bc1)[a-zA-HJ-NP-Z0-9]{8,90}$/.test(s.trim())) {
-    return 'Enter a valid mainnet Bitcoin address (starts with 1, 3, or bc1).'
-  }
-  return null
 }
 
 interface Samples {
@@ -126,6 +68,11 @@ export default function Landing({ onTxSubmit, onAddressSubmit }: LandingProps) {
     if (e.key === 'Enter') handleSubmit()
   }
 
+  function handleValueChange(v: string) {
+    setValue(v)
+    setError(null)
+  }
+
   function handleSampleClick(s: string) {
     setValue(s)
     submit(s)
@@ -135,20 +82,7 @@ export default function Landing({ onTxSubmit, onAddressSubmit }: LandingProps) {
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: 'var(--color-bg)' }}>
-      <header style={{
-        height: '48px',
-        backgroundColor: 'var(--color-surface)',
-        borderBottom: '1px solid var(--color-border)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: '0 var(--space-6)',
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
-          <Fingerprint size={15} style={{ color: 'var(--color-text)' }} />
-          <span style={{ fontSize: 'var(--text-base)', fontWeight: 600 }}>TxProbe</span>
-        </div>
-      </header>
+      <Header />
 
       <div style={{
         flex: 1,
@@ -221,101 +155,20 @@ export default function Landing({ onTxSubmit, onAddressSubmit }: LandingProps) {
             ))}
           </div>
 
-          {/* Input field */}
-          <div
-            className={shaking ? 'shake' : ''}
-            style={{ position: 'relative', display: 'flex', alignItems: 'center' }}
-          >
-            <Search
-              size={16}
-              style={{ position: 'absolute', left: '14px', color: 'var(--color-text-muted)', pointerEvents: 'none', flexShrink: 0 }}
-            />
-            <input
-              type="text"
-              value={value}
-              onChange={e => { setValue(e.target.value); setError(null) }}
-              onKeyDown={handleKeyDown}
-              placeholder={mode === 'transaction' ? 'Paste a transaction ID' : 'Paste a Bitcoin address'}
-              style={{
-                width: '100%',
-                height: '52px',
-                paddingLeft: '42px',
-                paddingRight: '16px',
-                fontFamily: 'var(--font-mono)',
-                fontSize: '15px',
-                border: `1px solid ${error ? 'var(--color-signal)' : 'var(--color-border)'}`,
-                borderRadius: 'var(--radius-sm)',
-                backgroundColor: 'var(--color-surface)',
-                color: 'var(--color-text)',
-                outline: 'none',
-                transition: 'border-color var(--duration-fast)',
-              }}
-              onFocus={e => { if (!error) e.target.style.borderColor = 'var(--color-text)' }}
-              onBlur={e => { if (!error) e.target.style.borderColor = 'var(--color-border)' }}
-            />
-          </div>
+          <SearchInput
+            mode={mode}
+            value={value}
+            error={error}
+            shaking={shaking}
+            onChange={handleValueChange}
+            onKeyDown={handleKeyDown}
+          />
 
-          {/* Sample chips — skeleton while loading, real chips after */}
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 'var(--space-2)',
-            marginTop: 'var(--space-3)',
-            minHeight: '26px',
-          }}>
-            {(samplesLoading || currentSamples) && (
-              <span style={{
-                fontSize: 'var(--text-xs)',
-                color: 'var(--color-text-muted)',
-                fontFamily: 'var(--font-mono)',
-                flexShrink: 0,
-                marginRight: '2px',
-              }}>
-                Try:
-              </span>
-            )}
-            {samplesLoading
-              ? [0, 1, 2].map(i => (
-                  <div key={i} style={{
-                    width: 112,
-                    height: 22,
-                    border: '1px solid var(--color-border)',
-                    borderRadius: 'var(--radius-sm)',
-                    backgroundColor: 'var(--color-border)',
-                    opacity: 0.5,
-                  }} />
-                ))
-              : currentSamples?.map(s => (
-                  <button
-                    key={s}
-                    onClick={() => handleSampleClick(s)}
-                    title={s}
-                    style={{
-                      padding: '3px 8px',
-                      fontFamily: 'var(--font-mono)',
-                      fontSize: 'var(--text-xs)',
-                      border: '1px solid var(--color-border)',
-                      borderRadius: 'var(--radius-sm)',
-                      backgroundColor: 'var(--color-surface)',
-                      color: 'var(--color-text-muted)',
-                      cursor: 'pointer',
-                      transition: 'all var(--duration-fast)',
-                      whiteSpace: 'nowrap',
-                    }}
-                    onMouseEnter={e => {
-                      e.currentTarget.style.borderColor = 'var(--color-text)'
-                      e.currentTarget.style.color = 'var(--color-text)'
-                    }}
-                    onMouseLeave={e => {
-                      e.currentTarget.style.borderColor = 'var(--color-border)'
-                      e.currentTarget.style.color = 'var(--color-text-muted)'
-                    }}
-                  >
-                    {truncateId(s, 8, 6)}
-                  </button>
-                ))
-            }
-          </div>
+          <SampleChips
+            loading={samplesLoading}
+            samples={currentSamples}
+            onSampleClick={handleSampleClick}
+          />
 
           {/* Validation error */}
           {error && (
@@ -360,70 +213,8 @@ export default function Landing({ onTxSubmit, onAddressSubmit }: LandingProps) {
         </div>
       </div>
 
-      {/* FAQ section */}
-      <section style={{
-        borderTop: '1px solid var(--color-border)',
-        backgroundColor: 'var(--color-surface)',
-        display: 'flex',
-        justifyContent: 'center',
-        padding: 'var(--space-8)',
-      }}>
-        <div style={{ width: '100%', maxWidth: '640px' }}>
-          <p style={{
-            margin: '0 0 var(--space-6)',
-            fontFamily: 'var(--font-mono)',
-            fontSize: 'var(--text-xs)',
-            color: 'var(--color-text-muted)',
-            textTransform: 'uppercase',
-            letterSpacing: '0.08em',
-          }}>
-            Common questions
-          </p>
-          <Accordion type="single" collapsible>
-            {FAQ_ITEMS.map(item => (
-              <AccordionItem key={item.q} value={item.q}>
-                <AccordionTrigger>{item.q}</AccordionTrigger>
-                <AccordionContent>{item.a}</AccordionContent>
-              </AccordionItem>
-            ))}
-          </Accordion>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer style={{
-        borderTop: '1px solid var(--color-border)',
-        backgroundColor: 'var(--color-surface)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        height: '48px',
-        padding: '0 var(--space-6)',
-      }}>
-        <span style={{
-          fontFamily: 'var(--font-mono)',
-          fontSize: 'var(--text-xs)',
-          color: 'var(--color-text-muted)',
-        }}>
-          made with ❤️ by{' '}
-          <a
-            href="https://github.com/muchai254"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{
-              color: 'var(--color-text)',
-              textDecoration: 'none',
-              borderBottom: '1px solid var(--color-border)',
-              fontWeight: 500,
-              transition: 'border-color var(--duration-fast)',
-            }}
-            onMouseEnter={e => { e.currentTarget.style.borderBottomColor = 'var(--color-text)' }}
-            onMouseLeave={e => { e.currentTarget.style.borderBottomColor = 'var(--color-border)' }}
-          >
-            muchai254
-          </a>
-        </span>
-      </footer>
+      <FaqSection />
+      <LandingFooter />
     </div>
   )
 }
