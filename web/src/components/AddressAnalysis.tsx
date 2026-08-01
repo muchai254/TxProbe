@@ -6,6 +6,8 @@ import Header from './Header'
 import AddressSummary from './AddressSummary'
 import TransactionTimeline from './TransactionTimeline'
 import { WalletLoadingState } from './LoadingState'
+import PageShell from './ui/PageShell'
+import SecondaryButton from './ui/SecondaryButton'
 
 interface Props {
   address: string;
@@ -80,21 +82,21 @@ export default function AddressAnalysis({ address, onBack, onTxClick }: Props) {
     return () => { abortRef.current = true }
   }, [address])
 
+  const header = <Header onBack={onBack} contextId={address} backLabel="Back" />
+
   if (state.status === 'fetching') {
     return (
-      <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: 'var(--color-bg)' }}>
-        <Header onBack={onBack} contextId={address} backLabel="Back" />
+      <PageShell header={header}>
         <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <WalletLoadingState phase="fetching" fetchProgress={{ done: 0, total: 1 }} />
         </div>
-      </div>
+      </PageShell>
     )
   }
 
   if (state.status === 'analyzing') {
     return (
-      <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: 'var(--color-bg)' }}>
-        <Header onBack={onBack} contextId={address} backLabel="Back" />
+      <PageShell header={header}>
         <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <WalletLoadingState
             phase="analyzing"
@@ -104,14 +106,13 @@ export default function AddressAnalysis({ address, onBack, onTxClick }: Props) {
             }}
           />
         </div>
-      </div>
+      </PageShell>
     )
   }
 
   if (state.status === 'error') {
     return (
-      <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: 'var(--color-bg)' }}>
-        <Header onBack={onBack} contextId={address} backLabel="Back" />
+      <PageShell header={header}>
         <div style={{
           flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center',
           flexDirection: 'column', gap: 'var(--space-4)',
@@ -123,26 +124,15 @@ export default function AddressAnalysis({ address, onBack, onTxClick }: Props) {
           }}>
             {state.message}
           </p>
-          <button
-            onClick={onBack}
-            style={{
-              fontFamily: 'var(--font-mono)', fontSize: 'var(--text-sm)',
-              padding: '6px 14px', border: '1px solid var(--color-border)',
-              borderRadius: 'var(--radius-sm)', background: 'none', cursor: 'pointer',
-              color: 'var(--color-text)',
-            }}
-          >
-            Back
-          </button>
+          <SecondaryButton onClick={onBack}>Back</SecondaryButton>
         </div>
-      </div>
+      </PageShell>
     )
   }
 
   // success
   return (
-    <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: 'var(--color-bg)' }}>
-      <Header onBack={onBack} contextId={address} backLabel="Back" />
+    <PageShell header={header}>
       <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
         <AddressSummary
           address={address}
@@ -158,6 +148,6 @@ export default function AddressAnalysis({ address, onBack, onTxClick }: Props) {
           onLoadMore={() => setVisibleCount(c => c + 50)}
         />
       </div>
-    </div>
+    </PageShell>
   )
 }

@@ -6,6 +6,8 @@ import Header from './Header'
 import TxGraph from './TxGraph'
 import FindingsPanel from './FindingsPanel'
 import { TxLoadingState } from './LoadingState'
+import PageShell from './ui/PageShell'
+import SecondaryButton from './ui/SecondaryButton'
 
 interface Props {
   txid: string;
@@ -61,24 +63,14 @@ export default function TxAnalysis({ txid, source, onBack }: Props) {
 
   if (state.status === 'error') {
     return (
-      <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: 'var(--color-bg)' }}>
-        <Header onBack={onBack} backLabel={backLabel} contextId={txid} />
+      <PageShell header={<Header onBack={onBack} backLabel={backLabel} contextId={txid} />}>
         <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 'var(--space-4)' }}>
           <p style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--text-base)', color: 'var(--color-text-muted)', margin: 0 }}>
             {state.message}
           </p>
-          <button
-            onClick={() => window.location.reload()}
-            style={{
-              fontFamily: 'var(--font-mono)', fontSize: 'var(--text-sm)',
-              padding: '6px 14px', border: '1px solid var(--color-border)',
-              borderRadius: 'var(--radius-sm)', background: 'none', cursor: 'pointer', color: 'var(--color-text)',
-            }}
-          >
-            Retry
-          </button>
+          <SecondaryButton onClick={() => window.location.reload()}>Retry</SecondaryButton>
         </div>
-      </div>
+      </PageShell>
     )
   }
 
@@ -88,16 +80,18 @@ export default function TxAnalysis({ txid, source, onBack }: Props) {
     : []
 
   return (
-    <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: 'var(--color-bg)' }}>
-      <Header
-        onBack={onBack}
-        backLabel={backLabel}
-        contextId={txid}
-        showCopy={true}
-        showExternal={true}
-        externalUrl={`https://mempool.space/tx/${txid}`}
-      />
-
+    <PageShell
+      header={
+        <Header
+          onBack={onBack}
+          backLabel={backLabel}
+          contextId={txid}
+          showCopy={true}
+          showExternal={true}
+          externalUrl={`https://mempool.space/tx/${txid}`}
+        />
+      }
+    >
       <div style={{ flex: 1, overflow: 'auto', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         {(state.status === 'fetching' || state.status === 'analyzing') && (
           <TxLoadingState phase={state.status === 'fetching' ? 'fetching' : 'analyzing'} />
@@ -120,6 +114,6 @@ export default function TxAnalysis({ txid, source, onBack }: Props) {
           detectedCount={detectedHeuristics.length}
         />
       )}
-    </div>
+    </PageShell>
   )
 }

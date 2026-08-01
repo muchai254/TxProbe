@@ -4,6 +4,8 @@ import { getHeuristic, HEURISTIC_IDS } from '../lib/heuristics'
 import { truncateId } from '../lib/format'
 import { isLowScore } from '../lib/score'
 
+const TIMELINE_GRID_TEMPLATE_COLUMNS = '90px 1fr 100px auto'
+
 interface TransactionTimelineProps {
   transactions: TxSummary[];
   activeFilter: HeuristicId | null;
@@ -62,7 +64,7 @@ export default function TransactionTimeline({
 
       <div style={{
         display: 'grid',
-        gridTemplateColumns: '90px 1fr 100px auto',
+        gridTemplateColumns: TIMELINE_GRID_TEMPLATE_COLUMNS,
         gap: 'var(--space-4)',
         padding: '0 var(--space-6)',
         height: '36px',
@@ -91,7 +93,7 @@ export default function TransactionTimeline({
               className={idx < 30 ? 'fade-in' : ''}
               style={{
                 display: 'grid',
-                gridTemplateColumns: '90px 1fr 100px auto',
+                gridTemplateColumns: TIMELINE_GRID_TEMPLATE_COLUMNS,
                 gap: 'var(--space-4)',
                 padding: '0 var(--space-6)',
                 height: '44px',
