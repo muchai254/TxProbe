@@ -1,7 +1,7 @@
 # Nixpacks build config for Railway.
 
 [phases.setup]
-nixPkgs = ["rustup", "gcc", "nodejs_20"]
+nixPkgs = ["rustup", "gcc", "nodejs_22"]
 cmds = ["rustup default stable"]
 
 [phases.install]
