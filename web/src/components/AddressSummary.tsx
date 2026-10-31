@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import PrivacyScoreRing from './PrivacyScoreRing'
 import { ArrowUpRight } from 'lucide-react'
 import type { AddressStats } from '../lib/types'
@@ -36,11 +37,17 @@ export default function AddressSummary({
       <div
         style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-4)' }}
       >
-        <PrivacyScoreRing
-          score={stats.overall_score}
-          size={80}
-          animate={true}
-        />
+        <Link
+          to="/how-it-works#score"
+          title="How is this score calculated?"
+          style={{ display: 'flex' }}
+        >
+          <PrivacyScoreRing
+            score={stats.overall_score}
+            size={80}
+            animate={true}
+          />
+        </Link>
         <div>
           <div className="label-micro" style={{ marginBottom: '4px' }}>
             Privacy Score

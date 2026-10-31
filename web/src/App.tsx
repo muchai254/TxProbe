@@ -10,6 +10,7 @@ import { useState, useCallback } from 'react'
 import Landing from './components/Landing'
 import TxAnalysis from './components/TxAnalysis'
 import AddressAnalysis from './components/AddressAnalysis'
+import HowItWorks from './components/HowItWorks'
 
 function TxRoute() {
   const { txid } = useParams<{ txid: string }>()
@@ -53,6 +54,7 @@ function AppRoutes() {
         }
       />
       <Route path="/tx/:txid" element={<TxRoute />} />
+      <Route path="/how-it-works" element={<HowItWorks />} />
       <Route
         path="/address"
         element={

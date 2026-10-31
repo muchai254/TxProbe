@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom'
+
 export default function LandingFooter() {
   return (
     <footer
@@ -7,6 +9,7 @@ export default function LandingFooter() {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
+        gap: 'var(--space-4)',
         height: '48px',
         padding: '0 var(--space-6)',
       }}
@@ -39,6 +42,25 @@ export default function LandingFooter() {
           muchai254
         </a>
       </span>
+      <span style={{ color: 'var(--color-text-muted)' }}>·</span>
+      <Link
+        to="/how-it-works"
+        style={{
+          fontSize: 'var(--text-xs)',
+          color: 'var(--color-text)',
+          borderBottom: 'var(--border-hairline)',
+          fontWeight: 500,
+          transition: 'border-color var(--duration-fast)',
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.borderBottomColor = 'var(--color-text)'
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.borderBottomColor = 'var(--color-border)'
+        }}
+      >
+        How it works
+      </Link>
     </footer>
   )
 }

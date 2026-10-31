@@ -1,5 +1,6 @@
 import { ArrowLeft, Copy, ExternalLink, Check, Fingerprint } from 'lucide-react'
 import { useState } from 'react'
+import { Link, useLocation } from 'react-router-dom'
 import { truncateId } from '../lib/format'
 
 interface HeaderProps {
@@ -20,6 +21,7 @@ export default function Header({
   externalUrl,
 }: HeaderProps) {
   const [copied, setCopied] = useState(false)
+  const { pathname } = useLocation()
 
   function handleCopy() {
     if (!contextId) return
@@ -106,6 +108,26 @@ export default function Header({
           gap: 'var(--space-1)',
         }}
       >
+        {pathname !== '/how-it-works' && (
+          <Link
+            to="/how-it-works"
+            style={{
+              color: 'var(--color-text-muted)',
+              fontSize: 'var(--text-sm)',
+              padding: '4px 8px',
+              whiteSpace: 'nowrap',
+              transition: 'color var(--duration-fast)',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.color = 'var(--color-text)'
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.color = 'var(--color-text-muted)'
+            }}
+          >
+            How it works
+          </Link>
+        )}
         {showCopy && contextId && (
           <button
             onClick={handleCopy}

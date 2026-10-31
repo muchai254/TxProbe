@@ -4,6 +4,7 @@ import { HEURISTIC_LIST } from '../lib/heuristics'
 import { SEVERITY_SUMMARY_LABELS } from '../lib/severity'
 import { getScoreLabel, isCleanScore } from '../lib/score'
 import HeuristicRow from './HeuristicRow'
+import { Link } from 'react-router-dom'
 import PrivacyScoreRing from './PrivacyScoreRing'
 
 interface FindingsPanelProps {
@@ -68,7 +69,13 @@ export default function FindingsPanel({
           borderBottom: 'var(--border-hairline)',
         }}
       >
-        <PrivacyScoreRing score={score} size={48} animate={true} />
+        <Link
+          to="/how-it-works#score"
+          title="How is this score calculated?"
+          style={{ display: 'flex' }}
+        >
+          <PrivacyScoreRing score={score} size={48} animate={true} />
+        </Link>
         <div>
           <div className="label-micro" style={{ marginBottom: '2px' }}>
             Privacy Score

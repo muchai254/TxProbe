@@ -4,6 +4,7 @@ import {
   AccordionTrigger,
   AccordionContent,
 } from '../ui/Accordion'
+import { Link } from 'react-router-dom'
 import { FAQ_ITEMS } from './content'
 
 export default function FaqSection() {
@@ -37,6 +38,26 @@ export default function FaqSection() {
             </AccordionItem>
           ))}
         </Accordion>
+        <Link
+          to="/how-it-works"
+          style={{
+            display: 'inline-block',
+            marginTop: 'var(--space-6)',
+            fontSize: 'var(--text-sm)',
+            color: 'var(--color-text)',
+            borderBottom: 'var(--border-hairline)',
+            fontWeight: 500,
+            transition: 'border-color var(--duration-fast)',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.borderBottomColor = 'var(--color-text)'
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.borderBottomColor = 'var(--color-border)'
+          }}
+        >
+          See every pattern explained →
+        </Link>
       </div>
     </section>
   )
