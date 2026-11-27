@@ -1,0 +1,10 @@
+.git
+.env
+.env.*
+target
+node_modules
+web/node_modules
+web/dist
+server/test-fixtures
+tests
+*.log
