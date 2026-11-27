@@ -24,23 +24,45 @@ export async function fetchSamples(): Promise<{
   return { txids: data.txids, addresses: data.addresses }
 }
 
-// Fetch tx history for a Bitcoin address directly from blockstream.info (CORS-enabled).
-// Returns lightweight summaries; privacy_score and detected_heuristics are initially empty
-// and are populated lazily by AddressAnalysis as each tx is analyzed.
-// Base URL duplicated from server/upstream.js's BLOCKSTREAM_API — this bypasses the
-// server entirely, so the two copies must be kept in sync by hand.
-export async function fetchAddressTxs(address: string): Promise<TxSummary[]> {
-  const res = await fetch(`https://blockstream.info/api/address/${address}/txs`)
-  if (!res.ok) {
-    if (res.status === 400) throw new Error('Invalid Bitcoin address.')
-    throw new Error(`Could not fetch transactions (HTTP ${res.status}).`)
+export type HistoryKind = 'address' | 'wallet'
+
+// Latest transactions for an address or an extended public key (xpub/ypub/zpub),
+// as lightweight summaries. privacy_score and detected_heuristics start empty and
+// are filled in by AddressAnalysis as batches are analyzed.
+export async function fetchHistory(
+  kind: HistoryKind,
+  id: string,
+): Promise<TxSummary[]> {
+  const res = await fetch(`/api/${kind}/${encodeURIComponent(id)}`)
+  const data = await res.json()
+  if (!res.ok || !data.ok) {
+    throw new Error(
+      data.error || `Could not fetch transactions (HTTP ${res.status}).`,
+    )
   }
-  const txs: Array<{ txid: string; status?: { block_height?: number } }> =
-    await res.json()
+  const txs: Array<{ txid: string; block_height: number }> = data.transactions
   return txs.map((tx) => ({
     txid: tx.txid,
-    block_height: tx.status?.block_height ?? 0,
+    block_height: tx.block_height,
     privacy_score: 0,
     detected_heuristics: [],
   }))
+}
+
+// Analyze up to 10 transactions in one request; the server batches every
+// upstream lookup across them. Failed txids are omitted from the result.
+export async function analyzeTxs(
+  txids: string[],
+): Promise<Record<string, TxAnalysisResponse>> {
+  const res = await fetch('/api/analyze-txs', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ txids }),
+  })
+  const data = await res.json()
+  if (!res.ok || !data.ok) {
+    throw new Error(data.error || `HTTP ${res.status}`)
+  }
+  const results: Record<string, TxAnalysisResponse> = data.results
+  return Object.fromEntries(Object.entries(results).filter(([, r]) => r.ok))
 }

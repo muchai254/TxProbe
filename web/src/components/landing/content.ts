@@ -9,7 +9,7 @@ export const FAQ_ITEMS = [
   },
   {
     q: 'What is a chain analysis heuristic?',
-    a: 'A heuristic is a pattern that blockchain analysts use to make inferences about who controls which coins. TxProbe applies the same 14 techniques used by professional analytics firms, so you can see exactly what they see.',
+    a: 'A heuristic is a pattern that blockchain analysts use to make inferences about who controls which coins. TxProbe applies the same 15 techniques used by professional analytics firms, so you can see exactly what they see.',
   },
   {
     q: 'Why does address reuse damage my privacy?',

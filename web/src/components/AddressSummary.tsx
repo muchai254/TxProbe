@@ -2,16 +2,19 @@ import { Link } from 'react-router-dom'
 import PrivacyScoreRing from './PrivacyScoreRing'
 import { ArrowUpRight } from 'lucide-react'
 import type { AddressStats } from '../lib/types'
+import type { HistoryKind } from '../lib/api'
 import { getHeuristic } from '../lib/heuristics'
 import { truncateId } from '../lib/format'
 
 interface AddressSummaryProps {
+  kind: HistoryKind
   address: string
   stats: AddressStats
   onWorstLeakClick: (txid: string) => void
 }
 
 export default function AddressSummary({
+  kind,
   address,
   stats,
   onWorstLeakClick,
@@ -66,7 +69,7 @@ export default function AddressSummary({
       {/* Address (truncated) */}
       <div>
         <div className="label-micro" style={{ marginBottom: '4px' }}>
-          Address
+          {kind === 'wallet' ? 'Wallet (extended public key)' : 'Address'}
         </div>
         <div
           style={{

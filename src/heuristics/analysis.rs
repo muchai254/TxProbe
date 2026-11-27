@@ -1,7 +1,7 @@
 // Single-transaction analysis orchestrator for txprobe-analyzer.
 // Unlike Sherlock's shared.rs (the ancestor block-scanning project's module this
 // one is named after), this module accepts a single ParsedTx plus prevout data
-// fetched from mempool.space.
+// and an optional one-hop graph context, both fetched by the server.
 
 use crate::address::address_from_script;
 use crate::crypto::hex_rev;
@@ -12,6 +12,7 @@ use serde_json::{json, Map, Value};
 
 use super::classification::{classify_tx, compute_privacy_score, infer_input_script_type};
 use super::common::{detected, is_spendable, not_detected, signals_rbf, COINBASE_VOUT};
+use super::context::TxGraphContext;
 use super::HEURISTICS;
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -31,10 +32,16 @@ pub struct TxContext<'a> {
     pub fee: u64,
     pub weight: u64,
     pub vbytes: u64,
+    // One-hop neighbourhood, when the caller supplied it.
+    pub graph: Option<&'a TxGraphContext>,
 }
 
 impl<'a> TxContext<'a> {
-    pub fn new(tx: &'a ParsedTx, prevouts: &[PrevoutEntry]) -> Self {
+    pub fn new(
+        tx: &'a ParsedTx,
+        prevouts: &[PrevoutEntry],
+        graph: Option<&'a TxGraphContext>,
+    ) -> Self {
         let input_values: Vec<u64> = prevouts.iter().map(|p| p.value).collect();
         let input_scripts: Vec<Vec<u8>> = prevouts
             .iter()
@@ -68,6 +75,7 @@ impl<'a> TxContext<'a> {
             fee,
             weight,
             vbytes,
+            graph,
         }
     }
 }
@@ -117,6 +125,7 @@ pub fn run_heuristics(ctx: &TxContext) -> HeuristicResults {
     let consolidation_detected = detected(result_of(&heuristics, "consolidation"));
     let cioh_detected = detected(result_of(&heuristics, "cioh"));
     let reuse_detected = detected(result_of(&heuristics, "address_reuse"));
+    let coinjoin_undone_detected = detected(result_of(&heuristics, "coinjoin_undone"));
     let change_result = result_of(&heuristics, "change_detection").clone();
 
     let classification = classify_tx(
@@ -143,6 +152,7 @@ pub fn run_heuristics(ctx: &TxContext) -> HeuristicResults {
         cioh_detected,
         reuse_detected,
         coinjoin_detected,
+        coinjoin_undone_detected,
         has_mixed_inputs,
         &change_result,
     );
@@ -228,8 +238,12 @@ pub fn build_response(ctx: &TxContext, results: &HeuristicResults) -> Value {
     })
 }
 
-pub fn analyze_single_tx(tx: &ParsedTx, prevouts: &[PrevoutEntry]) -> Value {
-    let ctx = TxContext::new(tx, prevouts);
+pub fn analyze_single_tx(
+    tx: &ParsedTx,
+    prevouts: &[PrevoutEntry],
+    graph: Option<&TxGraphContext>,
+) -> Value {
+    let ctx = TxContext::new(tx, prevouts, graph);
     let results = run_heuristics(&ctx);
     build_response(&ctx, &results)
 }

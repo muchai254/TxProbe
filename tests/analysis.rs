@@ -9,12 +9,14 @@ use serde_json::{json, Value};
 use std::fs;
 use std::path::Path;
 
-use txprobe_analyzer::{analyze_single_tx, parse_transaction, PrevoutEntry};
+use txprobe_analyzer::{analyze_single_tx, parse_transaction, PrevoutEntry, TxGraphContext};
 
 #[derive(Deserialize)]
 struct Fixture {
     raw_tx: String,
     prevouts: Vec<PrevoutEntry>,
+    #[serde(default)]
+    context: Option<TxGraphContext>,
 }
 
 fn run_fixture(name: &str) -> Value {
@@ -26,7 +28,7 @@ fn run_fixture(name: &str) -> Value {
 
     let raw_bytes = hex::decode(&fixture.raw_tx).expect("fixture raw_tx must be valid hex");
     let tx = parse_transaction(&raw_bytes).expect("fixture raw_tx must parse");
-    let analysis = analyze_single_tx(&tx, &fixture.prevouts);
+    let analysis = analyze_single_tx(&tx, &fixture.prevouts, fixture.context.as_ref());
 
     json!({ "ok": true, "analysis": analysis })
 }
@@ -95,6 +97,29 @@ fn taproot_spend() {
     assert_matches_golden("taproot_spend");
 }
 
+// ctx_* fixtures add a hand-built one-hop graph `context` to a real transaction,
+// exercising the rules that only run when the server supplies neighbours.
+
+#[test]
+fn ctx_change_confirmed() {
+    assert_matches_golden("ctx_change_confirmed");
+}
+
+#[test]
+fn ctx_change_contradicted() {
+    assert_matches_golden("ctx_change_contradicted");
+}
+
+#[test]
+fn ctx_history_reuse() {
+    assert_matches_golden("ctx_history_reuse");
+}
+
+#[test]
+fn ctx_coinjoin_undone() {
+    assert_matches_golden("ctx_coinjoin_undone");
+}
+
 #[test]
 fn inscription() {
     assert_matches_golden("inscription");
@@ -111,22 +136,17 @@ fn peeling_chain() {
 }
 
 // A dedicated round_payment fixture (an output value that's an exact multiple
-// of 0.01 BTC, per round_payment.rs:7) was not captured: blockstream.info
-// rate-limited this environment for the remainder of the Stage 0 session
+// of 0.01 BTC, per round_payment.rs:7) was not captured: the public API used
+// at the time rate-limited this environment for the remainder of the Stage 0 session
 // before it could be fetched. round_number_payment is otherwise only
 // exercised by the #[ignore]d coinjoin fixture below, so it currently has no
 // *passing* characterization coverage — add a dedicated fixture in a follow-up
 // once API access is available, following the pattern of the tests above.
 
-// coinjoin.json is deliberately excluded: detect_coinjoin (src/heuristics/coinjoin.rs)
-// picks the winning denomination via HashMap::iter().max_by_key(), which is
-// non-deterministic on ties (Rust's HashMap iteration order is randomized per
-// process). The real mainnet transaction used for this fixture has a 4-way tie,
-// so its golden output cannot be reproduced reliably run-to-run. This is a
-// latent bug in the analyzer, not a fixture-selection mistake — see plan.md
-// appendix. Do not fix it here; Stage 0 only establishes a baseline.
+// The real mainnet transaction behind coinjoin.json has a 4-way tie between
+// equal-output denominations. mixing_denomination (src/heuristics/coinjoin.rs)
+// breaks ties toward the larger value, so the golden is reproducible run-to-run.
 #[test]
-#[ignore = "detect_coinjoin's tie-break is non-deterministic (HashMap iteration order); see plan.md appendix"]
 fn coinjoin() {
     assert_matches_golden("coinjoin");
 }

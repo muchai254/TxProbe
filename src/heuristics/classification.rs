@@ -95,12 +95,14 @@ pub fn classify_tx(
 }
 
 /// Compute privacy score based on various signals
+#[allow(clippy::too_many_arguments)]
 pub fn compute_privacy_score(
     tx: &ParsedTx,
     is_coinbase: bool,
     cioh_detected: bool,
     reuse_detected: bool,
     coinjoin_detected: bool,
+    coinjoin_undone_detected: bool,
     has_mixed_inputs: bool,
     change_result: &Value,
 ) -> Option<u8> {
@@ -129,6 +131,9 @@ pub fn compute_privacy_score(
     }
     if reuse_detected {
         score -= 30;
+    }
+    if coinjoin_undone_detected {
+        score -= 25;
     }
     match change_confidence {
         "high" => score -= 15,

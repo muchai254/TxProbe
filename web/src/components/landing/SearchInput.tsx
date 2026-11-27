@@ -2,6 +2,12 @@ import { Search } from 'lucide-react'
 import type { KeyboardEvent } from 'react'
 import type { AppMode } from '../../lib/types'
 
+const PLACEHOLDERS: Record<AppMode, string> = {
+  transaction: 'Paste a transaction ID',
+  address: 'Paste a Bitcoin address',
+  wallet: 'Paste an xpub, ypub, or zpub',
+}
+
 interface SearchInputProps {
   mode: AppMode
   value: string
@@ -39,11 +45,7 @@ export default function SearchInput({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         onKeyDown={onKeyDown}
-        placeholder={
-          mode === 'transaction'
-            ? 'Paste a transaction ID'
-            : 'Paste a Bitcoin address'
-        }
+        placeholder={PLACEHOLDERS[mode]}
         style={{
           width: '100%',
           height: '52px',

@@ -5,8 +5,10 @@ mod change_detection;
 mod cioh;
 mod classification;
 mod coinjoin;
+mod coinjoin_undone;
 mod common;
 mod consolidation;
+mod context;
 mod inscription;
 mod locktime;
 mod op_return;
@@ -17,6 +19,7 @@ mod self_transfer;
 mod unnecessary_input;
 
 pub use analysis::{analyze_single_tx, PrevoutEntry};
+pub use context::TxGraphContext;
 
 use analysis::TxContext;
 use serde_json::Value;
@@ -30,6 +33,7 @@ const HEURISTICS: &[(&str, HeuristicFn)] = &[
     ("change_detection", change_detection::detect),
     ("address_reuse", address_reuse::detect),
     ("coinjoin", coinjoin::detect),
+    ("coinjoin_undone", coinjoin_undone::detect),
     ("consolidation", consolidation::detect),
     ("self_transfer", self_transfer::detect),
     ("peeling_chain", peeling_chain::detect),

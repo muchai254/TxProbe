@@ -1,0 +1,45 @@
+{
+  "raw_tx": "0100000000010171d2fff54cd8d528a2a223134c41dace29a064d0cb40015d1191cd89847d650c0000000000fdffffff01bc3c0a020000000017a9146bbe48f446f5075afe05877b399ef0ec5717bbe1870247304402205967a6403b04d513558a53e1c00b80d364610581aeb717d6133b429a25436f2c02201fc0a481c0244a6179a557462c7bae57dab39df019234f7443d97fe3a6db401e0121023eb58eea4586ba35980bb0b611a5935438a3129d6b1dde8f2779a8bfb70350a900000000",
+  "prevouts": [
+    {
+      "value": 34247340,
+      "scriptpubkey": "00142a005d2c674e242330851b301f02a2dbbaf0a293"
+    }
+  ],
+  "context": {
+    "tx": {
+      "txid": "d88b79b95305ec516482b8c77b9ac56324f7c76af6c534346553f8ac9d65829b",
+      "version": 1,
+      "lock_time": 0,
+      "is_rbf": true,
+      "input_count": 1,
+      "output_values": [
+        34225340
+      ],
+      "input_addresses": [
+        "bc1q9gq96tr8fcjzxvy9rvcp7q4zmwa0pg5n2jcxah"
+      ],
+      "input_types": [
+        "witness_v0_keyhash"
+      ]
+    },
+    "inputs": [
+      {
+        "parent": null
+      }
+    ],
+    "outputs": [
+      {
+        "spent_by": null
+      }
+    ],
+    "addresses": {
+      "3BWiBJSuRL5XSFefALtnwoRtZj91qwRihS": {
+        "output_count": 4
+      },
+      "bc1q9gq96tr8fcjzxvy9rvcp7q4zmwa0pg5n2jcxah": {
+        "output_count": 1
+      }
+    }
+  }
+}

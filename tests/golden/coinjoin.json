@@ -33,8 +33,11 @@
         "detected": true,
         "equal_output_count": 8,
         "estimated_participants": 8,
-        "mixing_denomination_sats": 20000000,
+        "mixing_denomination_sats": 28697814,
         "total_input_count": 15
+      },
+      "coinjoin_undone": {
+        "detected": false
       },
       "consolidation": {
         "detected": false

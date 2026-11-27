@@ -1,4 +1,4 @@
-import type { HeuristicId } from './types'
+import type { HeuristicId, HeuristicResult } from './types'
 
 export interface HeuristicMeta {
   id: HeuristicId
@@ -58,6 +58,18 @@ export const HEURISTICS: Record<HeuristicId, HeuristicMeta> = {
       'The observer knows mixing occurred, but cannot reliably link specific inputs to outputs.',
     nextTime:
       'Continue using CoinJoin. Consider using Whirlpool, JoinMarket, or Wasabi for coordinated mixing.',
+  },
+  coinjoin_undone: {
+    id: 'coinjoin_undone',
+    chip: 'UNMIX',
+    name: 'CoinJoin Undone',
+    severity: 'high',
+    detected:
+      'A coin that came out of a CoinJoin is spent together with other coins in this transaction.',
+    observerLearns:
+      'Spending a mixed coin alongside other coins links them to the same owner again, undoing the privacy the CoinJoin bought.',
+    nextTime:
+      'Spend each mixed coin on its own, and never combine it with unmixed change from the same wallet.',
   },
   consolidation: {
     id: 'consolidation',
@@ -200,4 +212,32 @@ export function getHeuristic(id: string): HeuristicMeta {
       nextTime: '',
     }
   )
+}
+
+// Evidence gathered from the surrounding transactions (parents, next spends,
+// address history), shown under a detected finding. Null when there is none.
+export function describeEvidence(
+  id: HeuristicId,
+  result: HeuristicResult,
+): string | null {
+  if (id === 'address_reuse' && result.reused_addresses?.length) {
+    const n = result.reused_addresses.length
+    return `${n} address${n === 1 ? ' has' : 'es have'} received coins more than once across ${n === 1 ? 'its' : 'their'} history: ${result.reused_addresses.join(', ')}`
+  }
+  if (id === 'change_detection') {
+    switch (result.confirmation) {
+      case 'confirmed':
+        return 'Confirmed by the next spend: the change output was later spent the way this wallet spends its own coins.'
+      case 'contradicted':
+        return 'Corrected by the next spend: the other output was the one later spent by this wallet, so it is now marked as the change.'
+      case 'unspent':
+        return 'The likely change output has not been spent yet, so the guess cannot be checked against its next spend.'
+    }
+  }
+  if (id === 'coinjoin_undone' && result.kind) {
+    return result.kind === 'postmix_merge'
+      ? 'Several coins from CoinJoins are merged together here.'
+      : 'A coin from a CoinJoin is merged with coins that were never mixed.'
+  }
+  return null
 }

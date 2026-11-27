@@ -11,6 +11,7 @@ import Landing from './components/Landing'
 import TxAnalysis from './components/TxAnalysis'
 import AddressAnalysis from './components/AddressAnalysis'
 import HowItWorks from './components/HowItWorks'
+import type { HistoryKind } from './lib/api'
 
 function TxRoute() {
   const { txid } = useParams<{ txid: string }>()
@@ -23,9 +24,10 @@ function TxRoute() {
 
 function AppRoutes() {
   const navigate = useNavigate()
-  const [addressState, setAddressState] = useState<{ address: string } | null>(
-    null,
-  )
+  const [historyState, setHistoryState] = useState<{
+    kind: HistoryKind
+    id: string
+  } | null>(null)
 
   const handleTxSubmit = useCallback(
     (txid: string) => {
@@ -34,13 +36,28 @@ function AppRoutes() {
     [navigate],
   )
 
-  const handleAddressSubmit = useCallback(
-    (address: string) => {
-      setAddressState({ address })
-      navigate('/address')
+  const handleHistorySubmit = useCallback(
+    (kind: HistoryKind, id: string) => {
+      setHistoryState({ kind, id })
+      navigate(`/${kind}`)
     },
     [navigate],
   )
+
+  const historyRoute = (kind: HistoryKind) =>
+    historyState?.kind === kind ? (
+      <AddressAnalysis
+        kind={kind}
+        address={historyState.id}
+        onBack={() => {
+          setHistoryState(null)
+          navigate('/')
+        }}
+        onTxClick={(txid) => navigate(`/tx/${txid}`)}
+      />
+    ) : (
+      <Navigate to="/" replace />
+    )
 
   return (
     <Routes>
@@ -49,29 +66,14 @@ function AppRoutes() {
         element={
           <Landing
             onTxSubmit={handleTxSubmit}
-            onAddressSubmit={handleAddressSubmit}
+            onHistorySubmit={handleHistorySubmit}
           />
         }
       />
       <Route path="/tx/:txid" element={<TxRoute />} />
       <Route path="/how-it-works" element={<HowItWorks />} />
-      <Route
-        path="/address"
-        element={
-          addressState ? (
-            <AddressAnalysis
-              address={addressState.address}
-              onBack={() => {
-                setAddressState(null)
-                navigate('/')
-              }}
-              onTxClick={(txid) => navigate(`/tx/${txid}`)}
-            />
-          ) : (
-            <Navigate to="/" replace />
-          )
-        }
-      />
+      <Route path="/address" element={historyRoute('address')} />
+      <Route path="/wallet" element={historyRoute('wallet')} />
     </Routes>
   )
 }

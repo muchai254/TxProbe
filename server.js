@@ -3,6 +3,17 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import routes from './server/routes.js';
 
+// Local development reads the key from .env; hosted deploys set it directly.
+try {
+  process.loadEnvFile();
+} catch {
+  // no .env file
+}
+if (!process.env.BLOCKCHAIR_API_KEY) {
+  console.error('BLOCKCHAIR_API_KEY is not set. Add it to .env or the environment.');
+  process.exit(1);
+}
+
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const app = express();

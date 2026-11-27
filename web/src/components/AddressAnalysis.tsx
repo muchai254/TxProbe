@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from 'react'
 import type { HeuristicId, TxSummary, AddressStats } from '../lib/types'
-import { fetchAddressTxs, analyzeTx } from '../lib/api'
+import { fetchHistory, analyzeTxs, type HistoryKind } from '../lib/api'
 import { computeStats } from '../lib/stats'
 import Header from './Header'
 import AddressSummary from './AddressSummary'
@@ -9,7 +9,14 @@ import { WalletLoadingState } from './LoadingState'
 import PageShell from './ui/PageShell'
 import SecondaryButton from './ui/SecondaryButton'
 
+// How many of the latest transactions are scored, and how many go in each
+// request (the server's batch limit).
+const ANALYZE_COUNT = 20
+const BATCH_SIZE = 10
+
 interface Props {
+  kind: HistoryKind
+  // An address or an extended public key, depending on kind.
   address: string
   onBack: () => void
   onTxClick: (txid: string) => void
@@ -21,7 +28,12 @@ type State =
   | { status: 'success'; transactions: TxSummary[]; stats: AddressStats }
   | { status: 'error'; message: string }
 
-export default function AddressAnalysis({ address, onBack, onTxClick }: Props) {
+export default function AddressAnalysis({
+  kind,
+  address,
+  onBack,
+  onTxClick,
+}: Props) {
   const [state, setState] = useState<State>({ status: 'fetching' })
   const [activeFilter, setActiveFilter] = useState<HeuristicId | null>(null)
   const [visibleCount, setVisibleCount] = useState(50)
@@ -34,7 +46,7 @@ export default function AddressAnalysis({ address, onBack, onTxClick }: Props) {
     async function run() {
       let txSummaries: TxSummary[]
       try {
-        txSummaries = await fetchAddressTxs(address)
+        txSummaries = await fetchHistory(kind, address)
       } catch (err) {
         if (!abortRef.current) {
           setState({
@@ -52,34 +64,36 @@ export default function AddressAnalysis({ address, onBack, onTxClick }: Props) {
         return
       }
 
-      const toAnalyze = txSummaries.slice(0, 20)
+      const toAnalyze = txSummaries.slice(0, ANALYZE_COUNT)
       const results: TxSummary[] = [...txSummaries]
 
       setState({ status: 'analyzing', transactions: results, analyzedCount: 0 })
 
-      for (let i = 0; i < toAnalyze.length; i++) {
+      for (let start = 0; start < toAnalyze.length; start += BATCH_SIZE) {
         if (abortRef.current) return
-        const txid = toAnalyze[i].txid
+        const batch = toAnalyze.slice(start, start + BATCH_SIZE)
         try {
-          const resp = await analyzeTx(txid)
-          const score = resp.analysis?.privacy_score ?? 0
-          const detected = Object.entries(resp.analysis?.heuristics ?? {})
-            .filter(([, v]) => v.detected)
-            .map(([k]) => k as HeuristicId)
-
-          results[i] = {
-            ...results[i],
-            privacy_score: score,
-            detected_heuristics: detected,
-          }
+          const responses = await analyzeTxs(batch.map((t) => t.txid))
+          batch.forEach((t, j) => {
+            const resp = responses[t.txid]
+            if (!resp) return
+            const detected = Object.entries(resp.analysis?.heuristics ?? {})
+              .filter(([, v]) => v.detected)
+              .map(([k]) => k as HeuristicId)
+            results[start + j] = {
+              ...results[start + j],
+              privacy_score: resp.analysis?.privacy_score ?? 0,
+              detected_heuristics: detected,
+            }
+          })
         } catch {
-          // Keep original placeholder for this tx
+          // Keep original placeholders for this batch
         }
         if (!abortRef.current) {
           setState({
             status: 'analyzing',
             transactions: [...results],
-            analyzedCount: i + 1,
+            analyzedCount: start + batch.length,
           })
         }
       }
@@ -94,7 +108,7 @@ export default function AddressAnalysis({ address, onBack, onTxClick }: Props) {
     return () => {
       abortRef.current = true
     }
-  }, [address])
+  }, [kind, address])
 
   const header = <Header onBack={onBack} contextId={address} backLabel="Back" />
 
@@ -133,7 +147,7 @@ export default function AddressAnalysis({ address, onBack, onTxClick }: Props) {
             phase="analyzing"
             analysisProgress={{
               done: state.analyzedCount,
-              total: Math.min(state.transactions.length, 20),
+              total: Math.min(state.transactions.length, ANALYZE_COUNT),
             }}
           />
         </div>
@@ -177,6 +191,7 @@ export default function AddressAnalysis({ address, onBack, onTxClick }: Props) {
     <PageShell header={header}>
       <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
         <AddressSummary
+          kind={kind}
           address={address}
           stats={state.stats}
           onWorstLeakClick={onTxClick}

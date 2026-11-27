@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react'
 import { ArrowRight } from 'lucide-react'
 import type { AppMode } from '../lib/types'
 import { fetchSamples } from '../lib/api'
-import { validateTxid, validateAddress } from '../lib/validation'
+import { validateTxid, validateAddress, validateXpub } from '../lib/validation'
+import type { HistoryKind } from '../lib/api'
 import { TYPING_SENTENCES, TYPING_COLORS } from './landing/content'
 import SearchInput from './landing/SearchInput'
 import SampleChips from './landing/SampleChips'
@@ -13,7 +14,7 @@ import TextType from './TextType'
 
 interface LandingProps {
   onTxSubmit: (txid: string) => void
-  onAddressSubmit: (address: string) => void
+  onHistorySubmit: (kind: HistoryKind, id: string) => void
 }
 
 interface Samples {
@@ -21,7 +22,7 @@ interface Samples {
   addresses: string[]
 }
 
-export default function Landing({ onTxSubmit, onAddressSubmit }: LandingProps) {
+export default function Landing({ onTxSubmit, onHistorySubmit }: LandingProps) {
   const [mode, setMode] = useState<AppMode>('transaction')
   const [value, setValue] = useState('')
   const [error, setError] = useState<string | null>(null)
@@ -47,8 +48,12 @@ export default function Landing({ onTxSubmit, onAddressSubmit }: LandingProps) {
 
   function submit(v: string) {
     const trimmed = v.trim()
-    const err =
-      mode === 'transaction' ? validateTxid(trimmed) : validateAddress(trimmed)
+    const validate = {
+      transaction: validateTxid,
+      address: validateAddress,
+      wallet: validateXpub,
+    }[mode]
+    const err = validate(trimmed)
     if (err) {
       setError(err)
       setShaking(true)
@@ -59,7 +64,7 @@ export default function Landing({ onTxSubmit, onAddressSubmit }: LandingProps) {
     if (mode === 'transaction') {
       onTxSubmit(trimmed)
     } else {
-      onAddressSubmit(trimmed)
+      onHistorySubmit(mode, trimmed)
     }
   }
 
@@ -81,8 +86,13 @@ export default function Landing({ onTxSubmit, onAddressSubmit }: LandingProps) {
     submit(s)
   }
 
+  // No samples for wallets: there is no public source of xpubs to suggest.
   const currentSamples =
-    mode === 'transaction' ? samples?.txids : samples?.addresses
+    mode === 'transaction'
+      ? samples?.txids
+      : mode === 'address'
+        ? samples?.addresses
+        : undefined
 
   return (
     <div
@@ -150,7 +160,7 @@ export default function Landing({ onTxSubmit, onAddressSubmit }: LandingProps) {
                 justifyContent: 'center',
               }}
             >
-              {(['transaction', 'address'] as AppMode[]).map((m) => (
+              {(['transaction', 'address', 'wallet'] as AppMode[]).map((m) => (
                 <button
                   key={m}
                   onClick={() => switchMode(m)}

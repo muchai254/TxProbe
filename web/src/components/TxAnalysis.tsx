@@ -130,7 +130,7 @@ export default function TxAnalysis({ txid, source, onBack }: Props) {
           contextId={txid}
           showCopy={true}
           showExternal={true}
-          externalUrl={`https://mempool.space/tx/${txid}`}
+          externalUrl={`https://blockchair.com/bitcoin/transaction/${txid}`}
         />
       }
     >

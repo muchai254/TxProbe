@@ -10,8 +10,9 @@ use super::common::{
     is_spendable, not_detected, DUST_FLOOR_LEGACY_SATS, DUST_FLOOR_P2WPKH_P2TR_SATS,
     DUST_FLOOR_P2WSH_SATS,
 };
+use super::context::{TxGraphContext, TxSummary};
 
-pub fn detect(ctx: &TxContext) -> Value {
+fn detect_from_tx(ctx: &TxContext) -> Value {
     let tx = ctx.tx;
     let (is_coinbase, fee, vbytes) = (ctx.is_coinbase, ctx.fee, ctx.vbytes);
     if is_coinbase || tx.inputs.is_empty() || tx.outputs.is_empty() {
@@ -145,4 +146,73 @@ pub fn detect(ctx: &TxContext) -> Value {
         "contributing_signals": best_signals,
         "fee_constrained": fee_constrained,
     })
+}
+
+pub fn detect(ctx: &TxContext) -> Value {
+    let mut result = detect_from_tx(ctx);
+    if let Some(graph) = ctx.graph {
+        refine_with_next_spend(&mut result, ctx, graph);
+    }
+    result
+}
+
+// The child spends its parent's output the way the parent's own wallet would:
+// it co-spends a coin from one of the parent's input addresses, or shares the
+// parent's wallet fingerprint (version, locktime style, RBF).
+fn spent_by_same_wallet(parent: &TxSummary, child: &TxSummary) -> bool {
+    let co_spends = child
+        .input_addresses
+        .iter()
+        .any(|a| parent.input_addresses.contains(a));
+    let same_fingerprint = child.version == parent.version
+        && (child.lock_time == 0) == (parent.lock_time == 0)
+        && child.is_rbf == parent.is_rbf;
+    co_spends || same_fingerprint
+}
+
+// Check the guessed change output against how it, and the other outputs, were
+// spent next. Confirmation raises confidence; a contradiction moves the guess to
+// the other output of a two-output transaction.
+fn refine_with_next_spend(result: &mut Value, ctx: &TxContext, graph: &TxGraphContext) {
+    let change_idx = match result.get("likely_change_index").and_then(Value::as_u64) {
+        Some(i) => i as usize,
+        None => return,
+    };
+
+    let wallet_spent = |idx: usize| -> Option<bool> {
+        graph
+            .outputs
+            .get(idx)
+            .and_then(|o| o.spent_by.as_ref())
+            .map(|child| spent_by_same_wallet(&graph.tx, child))
+    };
+
+    let payment_indices: Vec<usize> = ctx
+        .tx
+        .outputs
+        .iter()
+        .enumerate()
+        .filter(|(i, o)| *i != change_idx && is_spendable(o))
+        .map(|(i, _)| i)
+        .collect();
+
+    let change_match = wallet_spent(change_idx);
+    let payment_match = payment_indices
+        .iter()
+        .any(|&i| wallet_spent(i) == Some(true));
+
+    let confirmation = match change_match {
+        Some(true) if !payment_match => {
+            result["confidence"] = json!("high");
+            "confirmed"
+        }
+        Some(false) if payment_match && payment_indices.len() == 1 => {
+            result["likely_change_index"] = json!(payment_indices[0]);
+            result["confidence"] = json!("medium");
+            "contradicted"
+        }
+        None => "unspent",
+        _ => "inconclusive",
+    };
+    result["confirmation"] = json!(confirmation);
 }

@@ -29,6 +29,27 @@ transaction.
 
 ---
 
+## Running locally
+
+TxProbe reads Bitcoin data from the [Blockchair API](https://blockchair.com/api).
+Put your key in a `.env` file at the project root (it's git-ignored):
+
+```bash
+BLOCKCHAIR_API_KEY=your-key-here
+```
+
+Then:
+
+```bash
+cargo build --release      # the analyzer binary the server runs
+npm install && npm start   # API server on :3001
+cd web && npm install && npm run dev   # frontend on :3000
+```
+
+Tests: `cargo test`, `npm test` (server), and `cd web && npm test`.
+
+---
+
 ## Why it matters
 
 Bitcoin is pseudonymous, not anonymous. Every transaction is permanently
@@ -56,43 +77,52 @@ flowchart LR
     B["Browser<br/>React SPA"]
     S["Express server<br/>/api/*"]
     R["Rust analyzer<br/>txprobe-analyzer"]
-    E[("blockstream.info")]
+    E[("Blockchair API")]
 
-    B -->|"POST /api/analyze-tx"| S
-    S -->|"raw tx + prevouts"| E
+    B -->|"/api/*"| S
+    S -->|"batched dashboards"| E
     S -->|"JSON over stdin/stdout"| R
-    B -.->|"address tx list (direct)"| E
 ```
 
 - **Rust analyzer** (`src/`) — parses a raw transaction and its prevout data
-  from stdin, runs the 14 heuristics below, and writes a JSON report to
-  stdout. Invoked by the server as a subprocess.
-- **Node/Express server** (`server.js`, `server/`) — fetches raw transaction
-  data from blockstream.info, pipes it through the analyzer, caches the
-  result, and serves the built frontend.
+  plus an optional one-hop graph context from stdin, runs the 15 heuristics
+  below, and writes a JSON report to stdout. Invoked by the server as a subprocess.
+- **Node/Express server** (`server.js`, `server/`) — fetches transaction,
+  address and wallet data from the Blockchair API, rebuilds the raw
+  transaction from it, gathers the one-hop graph context, pipes everything
+  through the analyzer, and serves the built frontend. The API key never
+  leaves the server.
 - **React frontend** (`web/`) — paste a txid or address, see the privacy
   score, the detected heuristics, and a visual breakdown of inputs and
   outputs.
 
-Analyzing a single transaction goes through the server. Analyzing an
-**address** works a little differently: the browser fetches that address's
-transaction list straight from blockstream.info, then submits its 20 most
-recent transactions to the server to be scored one at a time.
+Every lookup goes through the server and is batched to keep API usage low:
+transaction dashboards are fetched 10 per call and address histories 100 per
+call. For each analyzed transaction the server also fetches its **one-hop
+neighbourhood**: the transactions that created its inputs, the transactions
+that spent its outputs, and the lifetime history of every address involved.
+A single transaction costs about 2–5 Blockchair request points; scoring an
+address's 20 latest transactions costs about 15–25.
+
+Addresses and **wallets** (xpub, ypub or zpub) work the same way: the server
+lists their latest transactions, and the browser submits the 20 most recent
+for analysis in two batches of 10.
 
 ---
 
 ## Privacy heuristics
 
-TxProbe checks every transaction against 14 heuristics. Each one detects a
+TxProbe checks every transaction against 15 heuristics. Each one detects a
 specific pattern that a chain analyst could use to learn something about the
 transaction's owner:
 
 | Heuristic | What it detects |
 |---|---|
 | **Common Input Ownership (CIOH)** | Multiple inputs in one transaction, which analysts assume belong to the same wallet, linking those addresses together. |
-| **Change Detection** | Which output is change returning to the sender versus payment going to the recipient, weighed from script type, value, output ordering, and fee/dust economics. |
-| **Address Reuse** | The same output script appearing more than once within a transaction, either across its outputs, or shared between an output and one of the inputs being spent. |
+| **Change Detection** | Which output is change returning to the sender versus payment going to the recipient, weighed from script type, value, output ordering, and fee/dust economics. The guess is then checked against how each output was spent next: confirmed (raised to high confidence) or corrected. |
+| **Address Reuse** | The same output script appearing more than once within a transaction, or any input/output address that has received coins more than once across its lifetime history. |
 | **CoinJoin Detection** | Three or more inputs paying repeated equal-value outputs above 10,000 sats, consistent with a CoinJoin mixing round. Flagged as a *positive* privacy signal, not a leak. |
+| **CoinJoin Undone** | A coin carrying a parent CoinJoin's denomination spent together with other coins (other mixed coins or unmixed change), re-linking what the mix separated. |
 | **Consolidation** | Three or more inputs merged into one or two outputs, confirming those inputs share an owner. |
 | **Self-Transfer** | A single input to a single output, i.e. a wallet moving funds to itself. |
 | **Peeling Chain** | A one- or two-input transaction whose two outputs differ by 10x or more, typical of a large UTXO being spent down gradually. The large remainder can be tracked through later transactions. |
@@ -121,6 +151,7 @@ private) and is adjusted based on which heuristics fire:
 | Common input ownership detected (and it isn't a CoinJoin) | −20 |
 | Inputs mix different script types | −10 |
 | Address reuse detected | −30 |
+| CoinJoin undone (mixed coin merged with other coins) | −25 |
 | Change output identified, high confidence | −15 |
 | Change output identified, medium confidence | −8 |
 | Change output identified, low confidence | −3 |

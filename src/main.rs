@@ -1,12 +1,14 @@
 use serde::Deserialize;
 use serde_json::json;
 use std::io::{self, Read};
-use txprobe_analyzer::{analyze_single_tx, parse_transaction, PrevoutEntry};
+use txprobe_analyzer::{analyze_single_tx, parse_transaction, PrevoutEntry, TxGraphContext};
 
 #[derive(Deserialize)]
 struct Input {
     raw_tx: String,
     prevouts: Vec<PrevoutEntry>,
+    #[serde(default)]
+    context: Option<TxGraphContext>,
 }
 
 fn main() {
@@ -40,7 +42,7 @@ fn main() {
         }
     };
 
-    let analysis = analyze_single_tx(&parsed, &input.prevouts);
+    let analysis = analyze_single_tx(&parsed, &input.prevouts, input.context.as_ref());
     let out = json!({ "ok": true, "analysis": analysis });
     println!("{}", out);
 }

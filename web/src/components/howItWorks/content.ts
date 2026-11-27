@@ -20,15 +20,15 @@ export const HEURISTIC_EXPLAINERS: Record<HeuristicId, HeuristicExplainer> = {
   },
   change_detection: {
     plain:
-      'Bitcoin works like cash: if you pay 30 with a 50 note, you get 20 back as "change", which goes to a new address that you own. Observers try to work out which output is the payment and which is your change. Once they know, they can follow your leftover money.',
+      'Bitcoin works like cash: if you pay 30 with a 50 note, you get 20 back as "change", which goes to a new address that you own. Observers try to work out which output is the payment and which is your change. Once they know, they can follow your leftover money. TxProbe also checks how each output was spent next: if the guessed change was later spent the way your wallet spends its own coins, the guess is confirmed.',
     scoreEffect:
-      'Lowers your score by 15 points if the change is very easy to spot, 8 points if it is fairly easy, and 3 points if it is only a weak guess.',
+      'Lowers your score by 15 points if the change is very easy to spot (or confirmed by how it was spent next), 8 points if it is fairly easy, and 3 points if it is only a weak guess.',
     avoid:
       'Use a wallet that makes your change look like the payment, for example by using the same address type as the person you are paying.',
   },
   address_reuse: {
     plain:
-      'A Bitcoin address is like an account number. If the same address appears more than once in a transaction, for example sending money back to an address it was just spent from, every observer can see that those coins have the same owner.',
+      'A Bitcoin address is like an account number. If the same address is used more than once, either inside one transaction or across its whole history, every observer can see that those payments belong to the same owner. TxProbe looks up the full history of every address in your transaction.',
     scoreEffect:
       'Lowers your score by 30 points. This is the largest single deduction, because it is the clearest link of all.',
     avoid:
@@ -41,6 +41,14 @@ export const HEURISTIC_EXPLAINERS: Record<HeuristicId, HeuristicExplainer> = {
       'Raises your score by 40 points. It also cancels the "multiple coins combined" and "output order" deductions, since those are expected in a CoinJoin.',
     avoid:
       'Nothing to avoid. If privacy matters to you, wallets with built-in CoinJoin support (such as Wasabi or JoinMarket) can do this for you.',
+  },
+  coinjoin_undone: {
+    plain:
+      'A coin that came out of a CoinJoin is spent together with other coins. The mix had separated that coin from your history; combining it with other coins links them back together. It is like going through a crowd to lose someone, then stopping to wave at them.',
+    scoreEffect:
+      'Lowers your score by 25 points, because it quietly cancels the privacy you paid the CoinJoin for.',
+    avoid:
+      'Spend each mixed coin on its own. Never combine mixed coins with each other or with change that was not mixed. Wallets with "coin control" let you choose exactly which coins to spend.',
   },
   consolidation: {
     plain:
@@ -124,7 +132,11 @@ export interface ScoreRow {
 }
 
 export const SCORE_PENALTIES: ScoreRow[] = [
-  { signal: 'The same address appears more than once', points: '−30' },
+  { signal: 'The same address is used more than once', points: '−30' },
+  {
+    signal: 'A coin from a CoinJoin is combined with other coins',
+    points: '−25',
+  },
   {
     signal: 'Several of your coins are combined (not a CoinJoin)',
     points: '−20',

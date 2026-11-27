@@ -28,6 +28,9 @@
       "coinjoin": {
         "detected": false
       },
+      "coinjoin_undone": {
+        "detected": false
+      },
       "consolidation": {
         "detected": false
       },

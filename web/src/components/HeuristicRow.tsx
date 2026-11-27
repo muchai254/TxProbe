@@ -1,7 +1,7 @@
 import { ChevronDown, ChevronUp } from 'lucide-react'
 import { useRef, useState, useLayoutEffect } from 'react'
 import type { HeuristicId, HeuristicResult } from '../lib/types'
-import { getHeuristic } from '../lib/heuristics'
+import { describeEvidence, getHeuristic } from '../lib/heuristics'
 import { SEVERITY_COLORS, SEVERITY_LABELS } from '../lib/severity'
 
 interface HeuristicRowProps {
@@ -32,6 +32,7 @@ export default function HeuristicRow({
   }, [expanded])
 
   const isDetected = result.detected
+  const evidence = describeEvidence(id, result)
   const colors = SEVERITY_COLORS[meta.severity]
 
   return (
@@ -163,6 +164,7 @@ export default function HeuristicRow({
               }}
             >
               <Section label="What was detected" text={meta.detected} />
+              {evidence && <Section label="Evidence" text={evidence} />}
               <Section
                 label="What an observer learns"
                 text={meta.observerLearns}

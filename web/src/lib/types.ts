@@ -3,6 +3,7 @@ export type HeuristicId =
   | 'change_detection'
   | 'address_reuse'
   | 'coinjoin'
+  | 'coinjoin_undone'
   | 'consolidation'
   | 'self_transfer'
   | 'peeling_chain'
@@ -17,10 +18,15 @@ export type HeuristicId =
 export interface HeuristicResult {
   detected: boolean
   confidence?: string
-  // The only per-heuristic payload field actually read by the UI (TxGraph, to mark
-  // the change output). The other 13 heuristics' extra fields go unread, so a full
-  // discriminated union over all of them isn't worth it — see the index signature below.
+  // The per-heuristic payload fields the UI reads: the change output (TxGraph) and
+  // the graph-context evidence shown in HeuristicRow. The other heuristics' extra
+  // fields go unread, so a full discriminated union over all of them isn't worth
+  // it — see the index signature below.
   likely_change_index?: number
+  confirmation?: 'confirmed' | 'contradicted' | 'unspent' | 'inconclusive'
+  scope?: 'transaction' | 'history' | 'none'
+  reused_addresses?: string[]
+  kind?: string
   [key: string]: unknown
 }
 
@@ -55,6 +61,13 @@ export interface TxAnalysis {
   heuristics: Record<HeuristicId, HeuristicResult>
   classification: string
   privacy_score: number
+  // How much of the one-hop transaction graph the server fetched.
+  context_summary?: {
+    parents: number
+    children: number
+    addresses: number
+    truncated: boolean
+  }
 }
 
 export interface TxAnalysisResponse {
@@ -85,5 +98,5 @@ export interface AddressStats {
   heuristic_counts: Record<string, number>
 }
 
-export type AppMode = 'transaction' | 'address'
+export type AppMode = 'transaction' | 'address' | 'wallet'
 export type NavSource = 'landing' | 'address'

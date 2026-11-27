@@ -174,10 +174,10 @@ export default function HowItWorks() {
             much you have.
           </p>
           <p style={{ ...paragraph, margin: 0 }}>
-            Companies that track Bitcoin look for 14 well-known patterns.
-            TxProbe checks your transaction for the same patterns, so you can
-            see what they would see. Below is how your privacy score is worked
-            out, followed by each pattern in plain words.
+            Companies that track Bitcoin look for well-known patterns. TxProbe
+            checks your transaction for the same patterns, so you can see what
+            they would see. Below is how your privacy score is worked out,
+            followed by each pattern in plain words.
           </p>
         </Section>
 
@@ -229,7 +229,10 @@ export default function HowItWorks() {
           </p>
         </Section>
 
-        <Section label="The patterns" title="The 14 patterns TxProbe looks for">
+        <Section
+          label="The patterns"
+          title={`The ${HEURISTIC_LIST.length} patterns TxProbe looks for`}
+        >
           <Accordion type="multiple">
             {HEURISTIC_LIST.map((h) => {
               const e = HEURISTIC_EXPLAINERS[h.id]
